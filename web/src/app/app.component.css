@@ -1,0 +1,22 @@
+.navbar-brand {
+    margin-left: 40px;
+}
+
+.navbar-collapse {
+    margin: 0 40px;
+}
+
+@media (max-width: 768px) {
+    .navbar-collapse {
+        margin: 10px 40px;
+    }
+}
+
+.nav-link {
+    padding: 8px 20px;
+    border-radius: 10px;
+}
+
+.nav-link.active {
+    border: 1px solid white;
+}
