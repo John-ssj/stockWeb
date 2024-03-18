@@ -2,8 +2,10 @@
     margin-left: 40px;
 }
 
-.navbar-collapse {
-    margin: 0 40px;
+@media (min-width: 768px) {
+    .navbar-collapse {
+        margin: 0 40px;
+    }
 }
 
 @media (max-width: 768px) {

@@ -2,17 +2,12 @@ import { Component } from '@angular/core';
 import { RouterLink, Router, ActivatedRoute, ParamMap } from '@angular/router';
 
 import { StockService } from '../stock.service';
-
+import { SearchBarComponent } from '../search-bar/search-bar.component';
 @Component({
   selector: 'app-stock-detail',
   standalone: true,
-  imports: [],
-  template: `
-    <p>
-      stock-detail works!
-    </p>
-    <p>{{stock}}</p>
-  `,
+  imports: [SearchBarComponent],
+  templateUrl: './stock-detail.component.html',
   styles: ``
 })
 export class StockDetailComponent {

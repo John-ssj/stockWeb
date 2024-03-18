@@ -1,0 +1,11 @@
+<h1 class="search-title">STOCK SEARCH</h1>
+
+<form class="searchbar" (ngSubmit)="searchStock($event)" [formGroup]="searchForm">
+  <input type="text" class="search-inputbox" formControlName="stockInput" autocomplete="off" placeholder="Enter Stock Ticker Symbol" required />
+  <div class="icon-container" (click)="searchStock($event)">
+    <span class="bi bi-search search-button"></span>
+  </div>
+  <div class="icon-container" (click)="clearSearch()">
+    <span class="bi bi-x-lg clear-button"></span>
+  </div>
+</form>
