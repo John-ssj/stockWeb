@@ -38,33 +38,97 @@ app.get('/stock/search', async (req, res) => {
   }
 });
 
+const getStockSummaryCharts = async (stock, t) => {
+  const time_to = t.toISOString().split('T')[0];
+  t.setDate(t.getDate() - 1);
+  const time_from = t.toISOString().split('T')[0];
+  const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/20/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+  try {
+    const response = await fetch(target_url);
+    const data = await response.json();
+    if (Object.keys(data).length === 0) {
+      return {};
+    } else {
+      extracted_data = data.results.map(item => [item.t, item.v]);
+      return extracted_data;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {};
+  }
+}
+
+// 这些函数应该在调用前确保stock值有效
+const getStockDetailAndSummary = async (stock) => {
+  const target_url_1 = `https://finnhub.io/api/v1/stock/profile2?symbol=${stock}&token=${api_key_finnhub}`;
+  const target_url_2 = `https://finnhub.io/api/v1/quote?symbol=${stock}&token=${api_key_finnhub}`;
+  const target_url_3 = `https://finnhub.io/api/v1/stock/peers?symbol=${stock}&token=${api_key_finnhub}`;
+  try {
+    const response_1 = await fetch(target_url_1);
+    const data_1 = await response_1.json();
+    const response_2 = await fetch(target_url_2);
+    const data_2 = await response_2.json();
+    const response_3 = await fetch(target_url_3);
+    const data_3 = await response_3.json();
+    if (Object.keys(data_1).length === 0 || Object.keys(data_2).length === 0 || Object.keys(data_3).length === 0) {
+      return {};
+    } else {
+      const date = new Date(data_2["t"] * 1000);
+      const timestamp = date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+      const now = new Date();
+      const diff = now.getTime() - date.getTime();
+      const diffMinutes = Math.abs(diff) / (1000 * 60);
+      const marketStatus = diffMinutes <= 5;
+
+      const summaryCharts = await getStockSummaryCharts(stock, date);
+
+      const outputData = {
+        "detail": {
+          "logo": data_1["logo"],
+          "symbol": data_1["ticker"],
+          "name": data_1["name"],
+          "code": data_1["exchange"],
+          "lastPrice": data_2["c"],
+          "change": data_2["d"],
+          "changePercent": data_2["dp"],
+          "timestamp": timestamp,
+          "status": marketStatus
+        },
+        "summary": {
+          "highPrice": data_2["h"],
+          "lowPrice": data_2["l"],
+          "openPrice": data_2["o"],
+          "prevClose": data_2["pc"],
+          "ipo": data_1["ipo"],
+          "industry": data_1["finnhubIndustry"],
+          "webpage": data_1["weburl"],
+          "peers": data_3
+        },
+        "summaryCharts": summaryCharts
+      };
+      return outputData;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {};
+  }
+};
+
+const getStockNews = async (stock) => { };
+
+const getStockCharts = async (stock) => { };
+
+const getStockInsights = async (stock) => { };
+
 app.get('/stock/company', async (req, res) => {
   if (!req.query.symbol) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
   if (!symbol) { return res.status(400).json({}); }
 
-  const target_url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${api_key_finnhub}`;
-  try {
-    const response = await fetch(target_url);
-    const data = await response.json();
-    if (Object.keys(data).length === 0) {
-      res.json({});
-    } else {
-      const requiredData = {
-        "logo": data["logo"],
-        "name": data["name"],
-        "symbol": data["ticker"],
-        "code": data["exchange"],
-        "date": data["ipo"],
-        "category": data["finnhubIndustry"]
-      };
-      res.json(requiredData);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({});
-  }
+  getStockDetailAndSummary(symbol).then(data => {
+    return res.json(data);
+  });
 });
 
 app.listen(port, () => {
