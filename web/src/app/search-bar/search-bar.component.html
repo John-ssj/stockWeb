@@ -1,7 +1,8 @@
 <h1 class="search-title">STOCK SEARCH</h1>
 
 <form class="searchbar" (ngSubmit)="searchStock($event)" [formGroup]="searchForm">
-  <input type="text" class="search-inputbox" formControlName="stockInput" autocomplete="off" placeholder="Enter Stock Ticker Symbol" required />
+  <input type="text" class="search-inputbox" formControlName="stockInput" autocomplete="off"
+    placeholder="Enter Stock Ticker Symbol" required />
   <div class="icon-container" (click)="searchStock($event)">
     <span class="bi bi-search search-button"></span>
   </div>
@@ -9,3 +10,10 @@
     <span class="bi bi-x-lg clear-button"></span>
   </div>
 </form>
+
+<div *ngIf="showSuggestions" class="list-group scrollable-list search-results">
+  <div *ngIf="showLoading" class="spinner-border" role="status"></div>
+  <div *ngFor="let result of stockSuggestions">
+    <a class="list-group-item list-group-item-action search-result-item" (click)="jumpToStock(result.symbol)">{{ result.symbol }} | {{ result.description }}</a>
+  </div>
+</div>

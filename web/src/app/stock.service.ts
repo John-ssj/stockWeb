@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 export class StockService {
   private stockSource = new BehaviorSubject<string>('');
   stock$ = this.stockSource.asObservable();
-
+  
   updateStock(stock: string) {
     this.stockSource.next(stock);
   }
