@@ -50,7 +50,7 @@ const getStockSummaryCharts = async (stock, t) => {
       return {};
     } else {
       extracted_data = data.results.map(item => {
-        return [item.t,  Number(item.vw.toFixed(2))]
+        return [item.t, Number(item.vw.toFixed(2))]
       });
       selected_data = extracted_data.length <= 24 ? extracted_data : extracted_data.slice(-24);
       return selected_data;
@@ -120,7 +120,35 @@ const getStockDetailAndSummary = async (stock) => {
 
 const getStockNews = async (stock) => { };
 
-const getStockCharts = async (stock) => { };
+const getStockCharts = async (stock) => {
+  t = new Date();
+  const time_to = t.toISOString().split('T')[0];
+  t.setFullYear(t.getFullYear() - 2);
+  const time_from = t.toISOString().split('T')[0];
+  const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/1/day/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+  try {
+    const response = await fetch(target_url);
+    const data = await response.json();
+    if (Object.keys(data).length === 0) {
+      return {};
+    } else {
+      ohlc = data.results.map(item => {
+        return [item.t, Number(item.o.toFixed(2)), Number(item.h.toFixed(2)), Number(item.l.toFixed(2)), Number(item.c.toFixed(2))]
+      });
+      volume = data.results.map(item => {
+        return [item.t, Number(item.v.toFixed(2))]
+      });
+      extracted_data = {
+        "ohlc": ohlc,
+        "volume": volume
+      };
+      return extracted_data;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {};
+  }
+};
 
 const getStockInsights = async (stock) => { };
 
@@ -130,9 +158,15 @@ app.get('/stock/company', async (req, res) => {
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
   if (!symbol) { return res.status(400).json({}); }
 
-  getStockDetailAndSummary(symbol).then(data => {
-    return res.json(data);
-  });
+  try {
+    return_data = await getStockDetailAndSummary(symbol);
+    stockCharts_data = await getStockCharts(symbol);
+    return_data["charts"] = stockCharts_data;
+    return res.json(return_data);
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({});
+  }
 });
 
 app.listen(port, () => {

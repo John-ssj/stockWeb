@@ -7,6 +7,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts/highstock';
+import indicators from 'highcharts/indicators/indicators';
+import volumeByPrice from 'highcharts/indicators/volume-by-price';
+
+indicators(Highcharts);
+volumeByPrice(Highcharts);
 
 import { StockService } from '../stock.service';
 import { ServerService } from '../server.service';
@@ -103,6 +108,7 @@ export class StockDetailComponent {
       this.detailDate = new Date();
     }
     this.updateSummaryCharts();
+    this.updateMainCharts();
   }
 
   fn_showDetailView() {
@@ -147,5 +153,102 @@ export class StockDetailComponent {
   }
 
   updateMainCharts() {
+    this.mainChartsOptions = {
+      chart: {
+        backgroundColor: '#f8f8f8'
+      },
+
+      rangeSelector: {
+        selected: 2
+      },
+
+      title: {
+        text: this.stock + ' Historical'
+      },
+
+      subtitle: {
+        text: 'With SMA and Volume by Price technical indicators'
+      },
+
+      yAxis: [{
+        startOnTick: false,
+        endOnTick: false,
+        labels: {
+          align: 'right',
+          x: -3
+        },
+        title: {
+          text: 'OHLC'
+        },
+        height: '60%',
+        lineWidth: 2,
+        resize: {
+          enabled: true
+        }
+      }, {
+        labels: {
+          align: 'right',
+          x: -3
+        },
+        title: {
+          text: 'Volume'
+        },
+        top: '65%',
+        height: '35%',
+        offset: 0,
+        lineWidth: 2
+      }],
+
+      tooltip: {
+        split: true
+      },
+
+      plotOptions: {
+        series: {
+          dataGrouping: {
+            units: [[
+              'week',
+              [1]
+            ], [
+              'month',
+              [1, 2, 3, 4, 6]
+            ]]
+          }
+        }
+      },
+
+      series: [{
+        type: 'candlestick',
+        name: this.stock,
+        id: this.stock.toLowerCase(),
+        zIndex: 2,
+        data: this.stockData.charts.ohlc
+      }, {
+        type: 'column',
+        name: 'Volume',
+        id: 'volume',
+        data: this.stockData.charts.volume,
+        yAxis: 1
+      }, {
+        type: 'vbp',
+        linkedTo: this.stock.toLowerCase(),
+        params: {
+          volumeSeriesID: 'volume'
+        },
+        dataLabels: {
+          enabled: false
+        },
+        zoneLines: {
+          enabled: false
+        }
+      }, {
+        type: 'sma',
+        linkedTo: this.stock.toLowerCase(),
+        zIndex: 1,
+        marker: {
+          enabled: false
+        }
+      }] as Highcharts.SeriesOptionsType[]
+    };
   }
 }
