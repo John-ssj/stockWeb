@@ -4,12 +4,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { ServerService } from '../server.service';
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [ReactiveFormsModule, HttpClientModule, CommonModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatProgressSpinnerModule],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css']
 })
@@ -57,6 +58,7 @@ export class SearchBarComponent implements OnInit {
         }
       });
     } else {
+      this.showSuggestions = false;
       this.stockSuggestions = [];
     }
   }

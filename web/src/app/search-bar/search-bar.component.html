@@ -11,9 +11,12 @@
   </div>
 </form>
 
-<div *ngIf="showSuggestions" class="list-group scrollable-list search-results">
-  <div *ngIf="showLoading" class="spinner-border" role="status"></div>
-  <div *ngFor="let result of stockSuggestions">
-    <a class="list-group-item list-group-item-action search-result-item" (click)="jumpToStock(result.symbol)">{{ result.symbol }} | {{ result.description }}</a>
+<div *ngIf="showSuggestions" class="search-results-container">
+  <div class="list-group scrollable-list search-results">
+    <mat-spinner *ngIf="showLoading" class="custom-spinner"></mat-spinner>
+    <div *ngFor="let result of stockSuggestions">
+      <a class="list-group-item list-group-item-action search-result-item" (click)="jumpToStock(result.symbol)">{{
+        result.symbol }} | {{ result.description }}</a>
+    </div>
   </div>
 </div>

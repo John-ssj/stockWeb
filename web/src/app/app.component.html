@@ -7,17 +7,20 @@
         <div [ngbCollapse]="isNavbarCollapsed" class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/search/home" (click)="gotoSearchView()" [class.active]="isLinkActive('/search')">search</a>
+                    <a class="nav-link" routerLink="/search/home" (click)="gotoSearchView()"
+                        [class.active]="isLinkActive('/search')">search</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/watchlist" [class.active]="isLinkActive('/watchlist')">watchlist</a>
+                    <a class="nav-link" routerLink="/watchlist"
+                        [class.active]="isLinkActive('/watchlist')">watchlist</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/portfolio" [class.active]="isLinkActive('/portfolio')">portfolio</a>
+                    <a class="nav-link" routerLink="/portfolio"
+                        [class.active]="isLinkActive('/portfolio')">portfolio</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
-<router-outlet />
+<router-outlet></router-outlet>
 <div class="fixed-bottom footer">Powered by&nbsp;<a href="https://www.Finnhub.io/" target="_blank">Finnhub.io</a></div>

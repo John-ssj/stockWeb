@@ -1,0 +1,180 @@
+.loadingView {
+    display: flex;
+    justify-content: center;
+}
+
+@media (min-width: 768px) {
+    .custom-spinner {
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 768px) {
+    .custom-spinner {
+        transform: scale(0.5);
+    }
+}
+
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.detail-company-container,
+.detail-stock-container {
+    text-align: center;
+}
+
+.detail-text-symbol,
+.detail-stock-price {
+    margin: 3px 0;
+    font-size: 24px;
+}
+
+.detail-text-name,
+.detail-stock-change {
+    margin: 3px 0;
+    font-size: 20px;
+    color: gray;
+}
+
+.detail-text-code,
+.detail-stock-date {
+    margin: 3px 0;
+    font-size: 14px;
+    color: gray;
+}
+
+.detail-stock-logo {
+    width: 100%;
+    min-width: 78px;
+    max-width: 120px;
+    height: auto;
+}
+
+.detail-but-sell-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.detail-market-status {
+    text-align: center;
+    font-size: 14px;
+    margin: 20px 0;
+}
+
+.tabView {
+    margin: 20px 0;
+}
+
+.summary-price {
+    margin: 20px;
+    font-size: 16px;
+}
+
+.summary-price-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.summary-price-item-left {
+    font-weight: bold;
+}
+
+.summary-company {
+    font-size: 18px;
+}
+
+.summary-company-title {
+    text-decoration: underline;
+}
+
+.summary-company-item {
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.summary-company-item-left {
+    font-weight: bold;
+}
+
+
+.summary-charts {
+    width: 100%;
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .summary-company {
+        margin: 20px;
+        max-width: 400px;
+    }
+
+    .summary-company-title {
+        margin: 20px;
+        font-size: 28px;
+    }
+
+    .summary-company-webpage {
+        max-width: 400px;
+        flex-wrap: wrap;
+    }
+
+    .summary-company-peers {
+        max-width: 400px;
+        flex-wrap: wrap;
+    }
+
+    .summary-charts {
+        height: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-company {
+        margin: 5px;
+        font-size: 16px;
+        max-width: 350px;
+    }
+
+    .summary-company-title {
+        margin: 5px;
+        font-size: 24px;
+    }
+
+    .summary-company-webpage {
+        max-width: 350px;
+        flex-wrap: wrap;
+    }
+
+    .summary-company-peers {
+        max-width: 350px;
+        flex-wrap: wrap;
+    }
+
+    .summary-charts {
+        height: 300px;
+    }
+}
+
+.main-charts {
+    width: 100%;
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .main-charts {
+        height: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-charts {
+        height: 450px;
+    }
+}

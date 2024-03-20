@@ -11,7 +11,7 @@
     border: #2729b4 solid 3px;
     border-radius: 21px;
     height: 42px;
-    margin: 10px auto;
+    margin: 10px auto 30px auto;
     display: flex;
     align-items: center;
 }
@@ -62,13 +62,23 @@
     transform: scale(1.1);
 }
 
+.search-results-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.custom-spinner {
+    transform: scale(0.4);
+}
+
 .search-results {
+    position: absolute;
     border: 1px solid #ccc;
     background: white;
     min-height: 60px;
     overflow-y: auto;
-    /* 使得超出部分可滚动 */
-    margin: -20px auto 40px auto;
+    margin: -40px auto 0 auto;
     display: flex;
     z-index: 1000;
 }

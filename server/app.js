@@ -42,15 +42,18 @@ const getStockSummaryCharts = async (stock, t) => {
   const time_to = t.toISOString().split('T')[0];
   t.setDate(t.getDate() - 1);
   const time_from = t.toISOString().split('T')[0];
-  const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/20/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+  const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/60/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
   try {
     const response = await fetch(target_url);
     const data = await response.json();
     if (Object.keys(data).length === 0) {
       return {};
     } else {
-      extracted_data = data.results.map(item => [item.t, item.v]);
-      return extracted_data;
+      extracted_data = data.results.map(item => {
+        return [item.t,  Number(item.vw.toFixed(2))]
+      });
+      selected_data = extracted_data.length <= 24 ? extracted_data : extracted_data.slice(-24);
+      return selected_data;
     }
   } catch (error) {
     console.error('Error:', error);
@@ -74,13 +77,14 @@ const getStockDetailAndSummary = async (stock) => {
       return {};
     } else {
       const date = new Date(data_2["t"] * 1000);
-      const timestamp = date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
       const now = new Date();
       const diff = now.getTime() - date.getTime();
       const diffMinutes = Math.abs(diff) / (1000 * 60);
       const marketStatus = diffMinutes <= 5;
 
       const summaryCharts = await getStockSummaryCharts(stock, date);
+
+      const output_data_3 = data_3.filter(str => /^[A-Za-z]+$/.test(str));
 
       const outputData = {
         "detail": {
@@ -90,19 +94,19 @@ const getStockDetailAndSummary = async (stock) => {
           "code": data_1["exchange"],
           "lastPrice": data_2["c"],
           "change": data_2["d"],
-          "changePercent": data_2["dp"],
-          "timestamp": timestamp,
+          "changePercent": Number(data_2["dp"].toFixed(2)),
+          "timestamp": data_2["t"] + '000',
           "status": marketStatus
         },
         "summary": {
-          "highPrice": data_2["h"],
-          "lowPrice": data_2["l"],
-          "openPrice": data_2["o"],
-          "prevClose": data_2["pc"],
+          "highPrice": Number(data_2["h"].toFixed(2)),
+          "lowPrice": Number(data_2["l"].toFixed(2)),
+          "openPrice": Number(data_2["o"].toFixed(2)),
+          "prevClose": Number(data_2["pc"].toFixed(2)),
           "ipo": data_1["ipo"],
           "industry": data_1["finnhubIndustry"],
           "webpage": data_1["weburl"],
-          "peers": data_3
+          "peers": output_data_3
         },
         "summaryCharts": summaryCharts
       };
