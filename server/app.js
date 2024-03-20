@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 
 const app = express();
@@ -8,10 +9,6 @@ app.use(cors());
 
 const api_key_finnhub = 'cn83jf1r01qplv1ek8f0cn83jf1r01qplv1ek8fg';
 const api_key_polygon = 'Rs6kySvg5Yir8e50SPLKAYW9gZXV7Ovr';
-
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
 
 app.get('/stock/search', async (req, res) => {
   if (!req.query.symbol) { return res.status(400).json({}); }
@@ -160,13 +157,23 @@ app.get('/stock/company', async (req, res) => {
 
   try {
     return_data = await getStockDetailAndSummary(symbol);
+    stockNews_data = await getStockNews(symbol);
     stockCharts_data = await getStockCharts(symbol);
+    stockInsights_data = await getStockInsights(symbol);
+    return_data["news"] = stockNews_data;
     return_data["charts"] = stockCharts_data;
+    return_data["insights"] = stockInsights_data;
     return res.json(return_data);
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({});
   }
+});
+
+app.use(express.static(__dirname + '/dist/web/browser'));
+
+app.get('*', function(req,res) {
+    res.sendFile(path.join(__dirname+'/dist/web/browser/index.html'));
 });
 
 app.listen(port, () => {
