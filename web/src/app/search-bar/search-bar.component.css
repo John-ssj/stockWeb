@@ -113,3 +113,26 @@
 .search-result-item:hover {
     background-color: #f0f0f0;
 }
+
+.error-container {
+    width: 80%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.error-message {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.close-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+}

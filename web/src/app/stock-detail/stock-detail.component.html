@@ -46,58 +46,56 @@
 
     <mat-tab-group animationDuration="0ms">
         <mat-tab label="Summary">
-            <div class="tabView">
-                <div class="row" style="margin: 0;">
-                    <div class="col-md-6">
-                        <div class="col-md-12">
-                            <div class="col-md-6 d-flex flex-column align-items-center summary-price">
-                                <div class="summary-price-item">
-                                    <div class="summary-price-item-left">Hight Price:&nbsp;</div>
-                                    <div>{{ stockData.summary.highPrice }}</div>
-                                </div>
-                                <div class="summary-price-item">
-                                    <div class="summary-price-item-left">Low Price:&nbsp;</div>
-                                    <div>{{ stockData.summary.lowPrice }}</div>
-                                </div>
-                                <div class="summary-price-item">
-                                    <div class="summary-price-item-left">Open Price:&nbsp;</div>
-                                    <div>{{ stockData.summary.openPrice }}</div>
-                                </div>
-                                <div class="summary-price-item">
-                                    <div class="summary-price-item-left">Prev. Close:&nbsp;</div>
-                                    <div>{{ stockData.summary.prevClose }}</div>
-                                </div>
+            <div class="row tabView" style="margin: 0;">
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <div class="col-md-6 d-flex flex-column align-items-center summary-price">
+                            <div class="summary-price-item">
+                                <div class="summary-price-item-left">Hight Price:&nbsp;</div>
+                                <div>{{ stockData.summary.highPrice }}</div>
+                            </div>
+                            <div class="summary-price-item">
+                                <div class="summary-price-item-left">Low Price:&nbsp;</div>
+                                <div>{{ stockData.summary.lowPrice }}</div>
+                            </div>
+                            <div class="summary-price-item">
+                                <div class="summary-price-item-left">Open Price:&nbsp;</div>
+                                <div>{{ stockData.summary.openPrice }}</div>
+                            </div>
+                            <div class="summary-price-item">
+                                <div class="summary-price-item-left">Prev. Close:&nbsp;</div>
+                                <div>{{ stockData.summary.prevClose }}</div>
                             </div>
                         </div>
-                        <div class="col-md-12 d-flex justify-content-center">
-                            <div class="summary-company d-flex flex-column align-items-center">
-                                <div class="summary-company-title">About the company</div>
-                                <div class="summary-company-item">
-                                    <div class="summary-price-item-left">IPO Start Date:&nbsp;</div>
-                                    <div>{{ stockData.summary.ipo }}</div>
-                                </div>
-                                <div class="summary-company-item">
-                                    <div class="summary-price-item-left">Industry:&nbsp;</div>
-                                    <div>{{ stockData.summary.industry }}</div>
-                                </div>
-                                <div class="summary-company-item summary-company-webpage">
-                                    <div class="summary-price-item-left">Webpage:&nbsp;</div>
-                                    <a [href]="stockData.summary.webpage">{{ stockData.summary.webpage }}</a>
-                                </div>
-                                <div class="summary-company-item summary-company-item-left">Company Peers:</div>
-                                <div class="d-flex flex-row justify-content-center summary-company-peers">
-                                    <div *ngFor="let peer of stockData.summary.peers">
-                                        <a [href]="'search/'+peer">{{ peer }},</a>
-                                    </div>
+                    </div>
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <div class="summary-company d-flex flex-column align-items-center">
+                            <div class="summary-company-title">About the company</div>
+                            <div class="summary-company-item">
+                                <div class="summary-price-item-left">IPO Start Date:&nbsp;</div>
+                                <div>{{ stockData.summary.ipo }}</div>
+                            </div>
+                            <div class="summary-company-item">
+                                <div class="summary-price-item-left">Industry:&nbsp;</div>
+                                <div>{{ stockData.summary.industry }}</div>
+                            </div>
+                            <div class="summary-company-item summary-company-webpage">
+                                <div class="summary-price-item-left">Webpage:&nbsp;</div>
+                                <a [href]="stockData.summary.webpage">{{ stockData.summary.webpage }}</a>
+                            </div>
+                            <div class="summary-company-item summary-company-item-left">Company Peers:</div>
+                            <div class="d-flex flex-row justify-content-center summary-company-peers">
+                                <div *ngFor="let peer of stockData.summary.peers">
+                                    <a [href]="'search/'+peer">{{ peer }},</a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <highcharts-chart [Highcharts]="summaryCharts" [options]="summaryChartsOptions"
-                            [constructorType]="'stockChart'" class="summary-charts">
-                        </highcharts-chart>
-                    </div>
+                </div>
+                <div class="col-md-6">
+                    <highcharts-chart [Highcharts]="summaryCharts" [options]="summaryChartsOptions"
+                        [constructorType]="'stockChart'" class="summary-charts">
+                    </highcharts-chart>
                 </div>
             </div>
         </mat-tab>
@@ -124,11 +122,45 @@
         </mat-tab>
 
         <mat-tab label="Insights">
-            <div class="tabView">
-
+            <div class="row tabView" style="margin: 0;">
+                <div class="insights-title">Insider Sentiments</div>
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-8">
+                    <table class="insights-table">
+                        <tr>
+                            <th>{{ stockData.detail.name }}</th>
+                            <th>MSPR</th>
+                            <th>Change</th>
+                        </tr>
+                        <tr>
+                            <td>Total</td>
+                            <td>{{ stockData.insights.totalMspr }}</td>
+                            <td>{{ stockData.insights.totalChange }}</td>
+                        </tr>
+                        <tr>
+                            <td>Positive</td>
+                            <td>{{ stockData.insights.positiveMspr }}</td>
+                            <td>{{ stockData.insights.positiveChange }}</td>
+                        </tr>
+                        <tr>
+                            <td>Negative</td>
+                            <td>{{ stockData.insights.negativeMspr }}</td>
+                            <td>{{ stockData.insights.negativeChange }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-6">
+                    hello
+                </div>
+                <div class="col-md-6">
+                    hello
+                </div>
             </div>
         </mat-tab>
     </mat-tab-group>
 </div>
 
-<div *ngIf="showErrorView" class="error-container">No data found. Please enter a valid Ticker</div>
+<div *ngIf="showErrorView" class="alert alert-danger error-container">No data found. Please enter a valid Ticker</div>

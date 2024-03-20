@@ -84,6 +84,7 @@ export class StockDetailComponent {
         const url = this.serverService.getServerUrl() + '/stock/company?symbol=' + this.stock;
         this.http.get<any>(url).subscribe({
           next: (result) => {
+            console.log('Stock data:', result);
             this.stockData = result;
             if (Object.keys(this.stockData).length === 0) {
               this.stockService.updateStockData("no");

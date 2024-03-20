@@ -19,7 +19,6 @@ function formatDate(date) {
   return `${month} ${day}, ${year}`;
 }
 
-
 app.get('/stock/search', async (req, res) => {
   if (!req.query.symbol) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
@@ -194,7 +193,48 @@ const getStockCharts = async (stock) => {
   }
 };
 
-const getStockInsights = async (stock) => { };
+const getStockInsights = async (stock) => {
+  const target_url = `https://finnhub.io/api/v1/stock/insider-sentiment?symbol=${stock}&from=2022-01-01&token=${api_key_finnhub}`;
+  filtered_data = {};
+  try {
+    const response = await fetch(target_url);
+    const data = await response.json();
+    if (Object.keys(data).length === 0) {
+      return {};
+    } else {
+      filtered_data = data.data.filter(item =>
+        item.mspr && item.change
+      );
+      let totalMspr = 0, positiveMspr = 0, negativeMspr = 0;
+      let totalChange = 0, positiveChange = 0, negativeChange = 0;
+
+      filtered_data.forEach(item => {
+        totalMspr += item.mspr;
+        totalChange += item.change;
+
+        if (item.mspr > 0) positiveMspr += item.mspr;
+        if (item.mspr < 0) negativeMspr += item.mspr;
+
+        if (item.change > 0) positiveChange += item.change;
+        if (item.change < 0) negativeChange += item.change;
+      });
+
+      extracted_data = {
+        "totalMspr": Number(totalMspr.toFixed(2)),
+        "positiveMspr": Number(positiveMspr.toFixed(2)),
+        "negativeMspr": Number(negativeMspr.toFixed(2)),
+        "totalChange": Number(totalChange.toFixed(2)),
+        "positiveChange": Number(positiveChange.toFixed(2)),
+        "negativeChange": Number(negativeChange.toFixed(2))
+      }
+      return extracted_data;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    console.log(filtered_data);
+    return {};
+  }
+};
 
 app.get('/stock/company', async (req, res) => {
   if (!req.query.symbol) { return res.status(400).json({}); }
@@ -204,6 +244,9 @@ app.get('/stock/company', async (req, res) => {
 
   try {
     return_data = await getStockDetailAndSummary(symbol);
+    if (Object.keys(return_data).length === 0) {
+      return res.json({});
+    }
     stockNews_data = await getStockNews(symbol);
     stockCharts_data = await getStockCharts(symbol);
     stockInsights_data = await getStockInsights(symbol);

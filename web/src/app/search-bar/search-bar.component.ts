@@ -21,6 +21,7 @@ export class SearchBarComponent implements OnInit {
     stockInput: new FormControl('', Validators.required)
   })
 
+  showErrorView = false;
   showSuggestions = false;
   showLoading = false;
   stockSuggestions: any[] = [];
@@ -43,6 +44,7 @@ export class SearchBarComponent implements OnInit {
   // stock补全提示
   stockSearch(value: string) {
     if (value !== '') {
+      this.showErrorView = false;
       this.showSuggestions = true;
       this.showLoading = true;
       this.stockSuggestions = [];
@@ -78,6 +80,9 @@ export class SearchBarComponent implements OnInit {
         this.router.navigate(['/search/' + stock]);
         this.loadStock(stock);
       }
+    } else {
+      // 输入为空，提示错误
+      this.showErrorView = true;
     }
   }
 
@@ -91,5 +96,9 @@ export class SearchBarComponent implements OnInit {
   loadStock(stock: string) {
     this.searchForm.get('stockInput')?.setValue(stock);
     this.showSuggestions = false;
+  }
+
+  closeErrorView() {
+    this.showErrorView = false;
   }
 }

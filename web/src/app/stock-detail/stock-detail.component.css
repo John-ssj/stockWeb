@@ -16,6 +16,8 @@
 }
 
 .error-container {
+    width: 80%;
+    margin: auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -249,4 +251,29 @@
     .main-charts {
         height: 450px;
     }
+}
+
+.insights-title {
+    font-size: 24px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.insights-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.insights-table tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.insights-table th,
+.insights-table td {
+    text-align: center;
+    padding: 8px;
+}
+
+.insights-table tr td:first-child {
+    font-weight: 700;
 }

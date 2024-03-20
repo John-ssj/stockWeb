@@ -20,3 +20,10 @@
     </div>
   </div>
 </div>
+
+<div *ngIf="showErrorView" class="alert alert-danger error-container">
+  <div class="error-message">
+    Please enter valid ticker
+  </div>
+  <span class="bi bi-x close-icon" (click)="closeErrorView()"></span>
+</div>
