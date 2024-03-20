@@ -104,9 +104,9 @@
 
         <mat-tab label="Top News">
             <div class="row row-cols-1 row-cols-md-2 tabView">
-                <div *ngFor="let newsItem of stockData.news">
+                <div *ngFor="let newsItem of stockData.news; index as i">
                     <div class="col">
-                        <div class="news-card">
+                        <div class="news-card" (click)="showNewsDetail(i)">
                             <div class="news-card-img" style="background-image: url('{{ newsItem.image }}');"></div>
                             <div class="news-card-text">{{ newsItem.headline }}</div>
                         </div>

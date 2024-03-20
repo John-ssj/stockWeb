@@ -1,0 +1,21 @@
+<div class="header">
+    <div>
+        <div class="source">{{ news.source }}</div>
+        <div class="datetime">{{ news.datetime }}</div>
+    </div>
+    <span [mat-dialog-close]="true" class="bi bi-x" style="font-size: 18px; color: blue;"></span>
+</div>
+
+<div class="line"></div>
+
+<div class="headline">{{ news.headline }}</div>
+<div class="summary">{{ news.summary }}</div>
+<p class="more-details">For more details click <a [href]="news.url" target="_blank"> here</a></p>
+
+<div class="share-container">
+    <div class="share-text">share</div>
+    <div class="icons">
+        <a [href]="twitterShareUrl" target="_blank"><span class="bi bi-twitter"></span></a>
+        <a [href]="facebookShareUrl" target="_blank"><span class="bi bi-facebook" style="color: #2500fd;"></span></a>
+    </div>
+</div>

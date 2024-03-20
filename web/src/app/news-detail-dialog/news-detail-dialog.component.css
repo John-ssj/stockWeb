@@ -1,0 +1,61 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 20px;
+}
+
+.source {
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.datetime {
+    font-size: 16px;
+    color: grey;
+}
+
+.line {
+    border-bottom: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+.headline {
+    margin: 0 20px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.summary {
+    margin: 0 20px;
+    font-size: 14px;
+    word-wrap: break-word;
+    color: gray;
+}
+
+.more-details {
+    margin: 0 20px;
+    font-size: 14px;
+    color: darkgray;
+}
+
+.share-container {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 20px;
+    padding: 10px 20px;
+}
+
+.share-text {
+    font-size: 20px;
+}
+
+.icons {
+    display: flex;
+    flex-direction: row;
+    font-size: 48px;
+}
+
+.bi {
+    margin: 0 5px;
+}

@@ -9,6 +9,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts/highstock';
 import indicators from 'highcharts/indicators/indicators';
 import volumeByPrice from 'highcharts/indicators/volume-by-price';
+import { MatDialog } from '@angular/material/dialog';
 
 indicators(Highcharts);
 volumeByPrice(Highcharts);
@@ -16,6 +17,7 @@ volumeByPrice(Highcharts);
 import { StockService } from '../stock.service';
 import { ServerService } from '../server.service';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
+import { NewsDetailDialogComponent } from '../news-detail-dialog/news-detail-dialog.component'; // 引入对话框组件
 @Component({
   selector: 'app-stock-detail',
   standalone: true,
@@ -47,6 +49,7 @@ export class StockDetailComponent {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
+    public dialog: MatDialog,
     private stockService: StockService,
     private serverService: ServerService
   ) { }
@@ -124,8 +127,17 @@ export class StockDetailComponent {
     this.showErrorView = true;
   }
 
-  showNewsDetail() {
-
+  showNewsDetail(index: number) {
+    const dialogRef = this.dialog.open(NewsDetailDialogComponent, {
+      width: '580px',
+      position: {
+        top: '30px',
+      },
+      data: this.stockData.news[index]
+    });
+    // dialogRef.afterClosed().subscribe(result => {
+    //   console.log('The dialog was closed');
+    // });
   }
 
   updateSummaryCharts() {

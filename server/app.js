@@ -10,6 +10,16 @@ app.use(cors());
 const api_key_finnhub = 'cn83jf1r01qplv1ek8f0cn83jf1r01qplv1ek8fg';
 const api_key_polygon = 'Rs6kySvg5Yir8e50SPLKAYW9gZXV7Ovr';
 
+function formatDate(date) {
+  const months = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  const year = date.getFullYear();
+  const month = months[date.getMonth()];
+  const day = date.getDate();
+  return `${month} ${day}, ${year}`;
+}
+
+
 app.get('/stock/search', async (req, res) => {
   if (!req.query.symbol) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
@@ -128,16 +138,17 @@ const getStockNews = async (stock) => {
     if (Object.keys(data).length === 0) {
       return [];
     } else {
-      filtered_data = data.filter(item => 
+      filtered_data = data.filter(item =>
         item.headline && item.image && item.source && item.datetime && item.summary && item.url
       );
-      selected_data = filtered_data.length <= 20 ? filtered_data : filtered_data.slice(0, 20);      
+      selected_data = filtered_data.length <= 20 ? filtered_data : filtered_data.slice(0, 20);
       extracted_data = selected_data.map(item => {
+        const formattedDate = formatDate(new Date(item.datetime * 1000));
         return {
           "headline": item.headline,
           "image": item.image,
           "source": item.source,
-          "datetime": item.datetime,
+          "datetime": formattedDate,
           "summary": item.summary,
           "url": item.url,
         }
