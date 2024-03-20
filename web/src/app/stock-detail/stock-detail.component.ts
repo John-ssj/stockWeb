@@ -124,6 +124,10 @@ export class StockDetailComponent {
     this.showErrorView = true;
   }
 
+  showNewsDetail() {
+
+  }
+
   updateSummaryCharts() {
     this.summaryChartsOptions = {
       chart: {

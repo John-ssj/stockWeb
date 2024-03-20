@@ -54,6 +54,7 @@ const getStockSummaryCharts = async (stock, t) => {
     }
   } catch (error) {
     console.error('Error:', error);
+    console.log(data);
     return {};
   }
 }
@@ -115,7 +116,40 @@ const getStockDetailAndSummary = async (stock) => {
   }
 };
 
-const getStockNews = async (stock) => { };
+const getStockNews = async (stock) => {
+  t = new Date();
+  const time_to = t.toISOString().split('T')[0];
+  t.setDate(t.getDate() - 7);
+  const time_from = t.toISOString().split('T')[0];
+  const target_url = `https://finnhub.io/api/v1/company-news?symbol=${stock}&from=${time_from}&to=${time_to}&token=${api_key_finnhub}`;
+  try {
+    const response = await fetch(target_url);
+    const data = await response.json();
+    if (Object.keys(data).length === 0) {
+      return [];
+    } else {
+      filtered_data = data.filter(item => 
+        item.headline && item.image && item.source && item.datetime && item.summary && item.url
+      );
+      selected_data = filtered_data.length <= 20 ? filtered_data : filtered_data.slice(0, 20);      
+      extracted_data = selected_data.map(item => {
+        return {
+          "headline": item.headline,
+          "image": item.image,
+          "source": item.source,
+          "datetime": item.datetime,
+          "summary": item.summary,
+          "url": item.url,
+        }
+      });;
+      return extracted_data;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    console.log(selected_data);
+    return {};
+  }
+};
 
 const getStockCharts = async (stock) => {
   t = new Date();
@@ -123,9 +157,10 @@ const getStockCharts = async (stock) => {
   t.setFullYear(t.getFullYear() - 2);
   const time_from = t.toISOString().split('T')[0];
   const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/1/day/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+  data = {};
   try {
     const response = await fetch(target_url);
-    const data = await response.json();
+    data = await response.json();
     if (Object.keys(data).length === 0) {
       return {};
     } else {
@@ -143,6 +178,7 @@ const getStockCharts = async (stock) => {
     }
   } catch (error) {
     console.error('Error:', error);
+    console.log(data);
     return {};
   }
 };
@@ -172,8 +208,8 @@ app.get('/stock/company', async (req, res) => {
 
 app.use(express.static(__dirname + '/dist/web/browser'));
 
-app.get('*', function(req,res) {
-    res.sendFile(path.join(__dirname+'/dist/web/browser/index.html'));
+app.get('*', function (req, res) {
+  res.sendFile(path.join(__dirname + '/dist/web/browser/index.html'));
 });
 
 app.listen(port, () => {
