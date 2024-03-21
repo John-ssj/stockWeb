@@ -44,7 +44,8 @@ app.get('/stock/search', async (req, res) => {
   }
 });
 
-const getStockSummaryCharts = async (stock, t) => {
+const getStockSummaryCharts = async (stock, date) => {
+  const t = new Date(Number(date));
   const time_to = t.toISOString().split('T')[0];
   t.setDate(t.getDate() - 1);
   const time_from = t.toISOString().split('T')[0];
@@ -74,12 +75,16 @@ const getStockDetailAndSummary = async (stock) => {
   const target_url_2 = `https://finnhub.io/api/v1/quote?symbol=${stock}&token=${api_key_finnhub}`;
   const target_url_3 = `https://finnhub.io/api/v1/stock/peers?symbol=${stock}&token=${api_key_finnhub}`;
   try {
-    const response_1 = await fetch(target_url_1);
-    const data_1 = await response_1.json();
-    const response_2 = await fetch(target_url_2);
-    const data_2 = await response_2.json();
-    const response_3 = await fetch(target_url_3);
-    const data_3 = await response_3.json();
+    const [response_1, response_2, response_3] = await Promise.all([
+      fetch(target_url_1),
+      fetch(target_url_2),
+      fetch(target_url_3)
+    ]);
+    const [data_1, data_2, data_3] = await Promise.all([
+      response_1.json(),
+      response_2.json(),
+      response_3.json()
+    ]);
     if (Object.keys(data_1).length === 0 || Object.keys(data_2).length === 0 || Object.keys(data_3).length === 0) {
       return {};
     } else {
@@ -88,8 +93,6 @@ const getStockDetailAndSummary = async (stock) => {
       const diff = now.getTime() - date.getTime();
       const diffMinutes = Math.abs(diff) / (1000 * 60);
       const marketStatus = diffMinutes <= 5;
-
-      const summaryCharts = await getStockSummaryCharts(stock, date);
 
       const output_data_3 = data_3.filter(str => /^[A-Za-z]+$/.test(str));
 
@@ -114,8 +117,7 @@ const getStockDetailAndSummary = async (stock) => {
           "industry": data_1["finnhubIndustry"],
           "webpage": data_1["weburl"],
           "peers": output_data_3
-        },
-        "summaryCharts": summaryCharts
+        }
       };
       return outputData;
     }
@@ -325,16 +327,23 @@ app.get('/stock/company', async (req, res) => {
     if (Object.keys(return_data).length === 0) {
       return res.json({});
     }
-    stockNews_data = await getStockNews(symbol);
-    stockCharts_data = await getStockCharts(symbol);
-    stockInsights_data = await getStockInsights(symbol);
-    stockInsightsTrendsCharts_data = await getStockInsightsTrendsCharts(symbol);
-    stockInsightsEPSCharts_data = await getStockInsightsEPSCharts(symbol);
+
+    const [summaryCharts, stockNews_data, stockCharts_data, stockInsights_data, stockInsightsTrendsCharts_data, stockInsightsEPSCharts_data] = await Promise.all([
+      getStockSummaryCharts(symbol, return_data.detail.timestamp),
+      getStockNews(symbol),
+      getStockCharts(symbol),
+      getStockInsights(symbol),
+      getStockInsightsTrendsCharts(symbol),
+      getStockInsightsEPSCharts(symbol),
+    ]);
+
+    return_data["summaryCharts"] = summaryCharts
     return_data["news"] = stockNews_data;
     return_data["charts"] = stockCharts_data;
     return_data["insights"] = stockInsights_data;
     return_data["insightsTrends"] = stockInsightsTrendsCharts_data;
     return_data["insightsEPS"] = stockInsightsEPSCharts_data;
+
     return res.json(return_data);
   } catch (error) {
     console.error('Error:', error);
@@ -353,6 +362,8 @@ app.get('/stock/update', async (req, res) => {
     if (Object.keys(return_data).length === 0) {
       return res.json({});
     }
+    summaryCharts = await getStockSummaryCharts(symbol, return_data.detail.timestamp);
+    return_data["summaryCharts"] = summaryCharts;
     return res.json(return_data);
   } catch (error) {
     console.error('Error:', error);
