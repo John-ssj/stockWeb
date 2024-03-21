@@ -148,11 +148,12 @@ export class StockDetailComponent implements OnInit, OnDestroy {
           this.stockData.summary = result.summary;
           this.stockData.summaryCharts = result.summaryCharts;
           this.stockService.updateStockData(this.stockData);
-          if (this.stockData.detail.status) {
-            this.detailDate = this.stockData.detail.timestamp;
-          } else {
-            this.detailDate = new Date();
-          }
+          // if (this.stockData.detail.status) {
+          //   this.detailDate = this.stockData.detail.timestamp;
+          // } else {
+          //   this.detailDate = new Date();
+          // }
+          this.detailDate = new Date();
           this.updateSummaryCharts();
           if (!this.stockData.detail.status) {
             if (this.updateSubscription) {
