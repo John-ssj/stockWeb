@@ -497,7 +497,7 @@ app.get('/financial/getInfo', async (req, res) => {
   try {
     const profile = await UserFinancialProfile.findOne({ id: 0 });
     const watchListExists = profile.watchList.some(item => item.stock === symbol);
-    const portfolioExists = profile.watchList.some(item => item.stock === symbol);
+    const portfolioExists = profile.portfolio.some(item => item.stock === symbol);
     res.json({ "watchList": watchListExists, "portfolio": portfolioExists });
   } catch (error) {
     console.error('Error:', error);

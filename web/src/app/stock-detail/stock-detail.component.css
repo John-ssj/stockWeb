@@ -15,14 +15,6 @@
     }
 }
 
-.error-container {
-    width: 80%;
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .detail-company-container,
 .detail-stock-container {
     text-align: center;
@@ -39,6 +31,13 @@
     margin: 3px 0;
     font-size: 20px;
     color: gray;
+}
+
+@media (max-width: 768px) {
+    .detail-text-name,
+    .detail-stock-change {
+        font-size: 16px;
+    }
 }
 
 .detail-text-code,
@@ -282,4 +281,27 @@
     margin-top: 20px;
     width: 100%;
     display: block;
+}
+
+.prompt-container {
+    width: 80%;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.prompt-message {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.close-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
 }

@@ -31,15 +31,19 @@ export class StockDetailComponent implements OnInit, OnDestroy {
 
   private updateSubscription: Subscription | null = null;
 
-  showLoading = false;
-  showDetailView = false;
-  showErrorView = false;
   stockData: any = {};
   detailDate: Date = new Date();
 
   collectBtn = false;
   sellBtn = false;
 
+  showLoading = false;
+  showDetailView = false;
+  showErrorView = false;
+  showCollectPrompt = false;
+  showUncollectPrompt = false;
+  showBuyPrompt = false;
+  showSellPrompt = false;
 
   // Highcharts
   summaryCharts: typeof Highcharts = Highcharts;
@@ -122,6 +126,23 @@ export class StockDetailComponent implements OnInit, OnDestroy {
         this.fn_showErrorView();
       }
     }
+
+  }
+
+  getCollectAndSellInfo() {
+    try {
+      const url = this.serverService.getServerUrl() + '/financial/getInfo?symbol=' + this.stock;
+      this.http.get<any>(url).subscribe({
+        next: (result) => {
+          if (Object.keys(result).length === 0) {
+            return;
+          }
+          this.collectBtn = result.watchList;
+          this.sellBtn = result.portfolio;
+        }
+      });
+    } catch (error) {
+    }
   }
 
   setUpViewData() {
@@ -134,6 +155,7 @@ export class StockDetailComponent implements OnInit, OnDestroy {
     this.updateMainCharts();
     this.updateInsightsTrendsCharts();
     this.updateInsightsEPSCharts();
+    this.getCollectAndSellInfo();
   }
 
   updateViewData() {
@@ -417,5 +439,46 @@ export class StockDetailComponent implements OnInit, OnDestroy {
         data: this.stockData.insightsEPS.estimate
       }] as Highcharts.SeriesSplineOptions[]
     };
+  }
+
+  collectStock() {
+    try {
+      const urlPath = this.collectBtn ? 'removeWatchList' : 'addWatchList';
+      const url = this.serverService.getServerUrl() + '/financial/' + urlPath + '?symbol=' + this.stock;
+      this.http.get<any>(url).subscribe({
+        next: (result) => {
+          if (Object.keys(result).length === 0) {
+            this.getCollectAndSellInfo();
+            return;
+          }
+          if (result.success) {
+            this.collectBtn = !this.collectBtn;
+            this.showCollectPrompt = this.collectBtn;
+            this.showUncollectPrompt = !this.collectBtn;
+            setTimeout(() => {
+              this.showCollectPrompt = false;
+              this.showUncollectPrompt = false;
+            }, 5000);
+          }
+        }
+      });
+    } catch (error) {
+    }
+  }
+
+  closeCollectPrompt() {
+    this.showCollectPrompt = false;
+  }
+
+  closeUncollectPrompt() {
+    this.showUncollectPrompt = false;
+  }
+
+  closeBuyPrompt() {
+    this.showBuyPrompt = false;
+  }
+
+  closeSellPrompt() {
+    this.showSellPrompt = false;
   }
 }

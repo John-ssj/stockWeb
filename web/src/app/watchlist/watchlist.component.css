@@ -1,0 +1,82 @@
+.prompt-container {
+    width: 80%;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.prompt-message {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.loadingView {
+    display: flex;
+    justify-content: center;
+}
+
+.watchlist-title {
+    font-size: 40px;
+    font-weight: 300;
+    color: #242426;
+    text-align: left;
+    margin: 20px 10%;
+}
+
+.watchlist-item-content {
+    margin: 10px 10%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 20px;
+    height: 160px;
+}
+
+.close-icon {
+    cursor: pointer;
+}
+
+.item-detail {
+    display: flex;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.item-detail-left,
+.item-detail-right {
+    flex: 1;
+    text-align: left;
+}
+
+.stock,
+.detail-stock-price {
+    margin: 10px 0;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.name,
+.detail-stock-change {
+    margin: 10px 0;
+    font-size: 20px;
+}
+
+@media (max-width: 768px) {
+    .watchlist-item-content {
+        margin: 10px 5%;
+        padding: 10px;
+    }
+
+    .stock,
+    .detail-stock-price {
+        font-size: 28px;
+    }
+
+    .name,
+    .detail-stock-change {
+        font-size: 18px;
+    }
+}

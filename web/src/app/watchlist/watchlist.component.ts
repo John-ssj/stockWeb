@@ -1,16 +1,82 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+import { ServerService } from '../server.service';
+
+interface StockItem {
+  stock: string;
+  name: string;
+  currentPrice: number;
+  change: number;
+  changePercent: number;
+}
 
 @Component({
   selector: 'app-watchlist',
   standalone: true,
-  imports: [],
-  template: `
-    <p>
-      watchlist works!
-    </p>
-  `,
-  styles: ``
+  imports: [CommonModule, HttpClientModule, MatProgressSpinnerModule],
+  templateUrl: './watchlist.component.html',
+  styleUrls: ['./watchlist.component.css']
 })
-export class WatchlistComponent {
+export class WatchlistComponent implements OnInit {
+  watchListData: StockItem[] = [];
 
+  showLoading = false;
+  showEmptyPrompt = false;
+
+  constructor(
+    private serverService: ServerService,
+    private http: HttpClient
+  ) { }
+
+  ngOnInit() {
+    this.showEmptyPrompt = false;
+    this.showLoading = true;
+    this.getWatchList();
+  }
+
+  getWatchList() {
+    try {
+      console.log('getWatchList');
+      const url = this.serverService.getServerUrl() + '/financial/getWatchList';
+      this.http.get<any>(url).subscribe({
+        next: (result) => {
+          this.showLoading = false;
+          this.showEmptyPrompt = false;
+          console.log('get data: ', result);
+          if (Object.keys(result).length === 0 || result.watchList.length === 0) {
+            this.watchListData = [];
+            this.showEmptyPrompt = true;
+            return;
+          }
+          this.watchListData = result.watchList;
+        }
+      });
+    } catch (error) {
+    }
+  }
+
+  uncollect(stock: string) {
+    try {
+      const url = this.serverService.getServerUrl() + '/financial/removeWatchList?symbol=' + stock;
+      this.http.get<any>(url).subscribe({
+        next: (result) => {
+          if (Object.keys(result).length === 0) {
+            this.getWatchList();
+            return;
+          }
+          if (result.success) {
+            this.watchListData = this.watchListData.filter(item => item.stock !== stock);
+            if(this.watchListData.length === 0) {
+              this.showEmptyPrompt = true;
+            }
+          }
+        }
+      });
+    } catch (error) {
+    }
+  }
 }

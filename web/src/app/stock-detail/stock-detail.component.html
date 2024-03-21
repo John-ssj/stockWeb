@@ -1,5 +1,39 @@
 <app-search-bar [initStock]="stock"></app-search-bar>
 
+<div *ngIf="showCollectPrompt" class="alert alert-success prompt-container">
+    <div class="prompt-message">
+        {{ stock }}&nbsp;added to Watchlist.
+    </div>
+    <span class="bi bi-x close-icon" (click)="closeCollectPrompt()"></span>
+</div>
+
+<div *ngIf="showUncollectPrompt" class="alert alert-danger prompt-container">
+    <div class="prompt-message">
+        {{ stock }}&nbsp;removed from Watchlist.
+    </div>
+    <span class="bi bi-x close-icon" (click)="closeUncollectPrompt()"></span>
+</div>
+
+<div *ngIf="showBuyPrompt" class="alert alert-success prompt-container">
+    <div class="prompt-message">
+        {{ stock }}&nbsp;bought successfully.
+    </div>
+    <span class="bi bi-x close-icon" (click)="closeBuyPrompt()"></span>
+</div>
+
+<div *ngIf="showSellPrompt" class="alert alert-danger prompt-container">
+    <div class="prompt-message">
+        {{ stock }}&nbsp;sold successfully.
+    </div>
+    <span class="bi bi-x close-icon" (click)="closeSellPrompt()"></span>
+</div>
+
+<div *ngIf="showErrorView" class="alert alert-danger prompt-container">
+    <div class="prompt-message">
+        No data found. Please enter a valid Ticker
+    </div>
+</div>
+
 <div *ngIf="showLoading" class="loadingView"><mat-spinner class="custom-spinner"></mat-spinner></div>
 <div *ngIf="showDetailView" class="container">
     <div class="detailView">
@@ -7,8 +41,9 @@
             <div class="col-5 d-flex flex-column align-items-center detail-company-container">
                 <div class="detail-text-symbol">
                     {{ stockData.detail.symbol }}
-                    <span *ngIf="!collectBtn" class="bi bi-star"></span>
-                    <span *ngIf="collectBtn" class="bi bi-star-fill" style="color: #fbdc06;"></span>
+                    <span *ngIf="!collectBtn" class="bi bi-star" (click)="collectStock()"></span>
+                    <span *ngIf="collectBtn" class="bi bi-star-fill" style="color: #fbdc06;"
+                        (click)="collectStock()"></span>
                 </div>
                 <div class="detail-text-name">{{ stockData.detail.name }}</div>
                 <div class="detail-text-code">{{ stockData.detail.code }}</div>
@@ -166,5 +201,3 @@
         </mat-tab>
     </mat-tab-group>
 </div>
-
-<div *ngIf="showErrorView" class="alert alert-danger error-container">No data found. Please enter a valid Ticker</div>
