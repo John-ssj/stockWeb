@@ -342,6 +342,24 @@ app.get('/stock/company', async (req, res) => {
   }
 });
 
+app.get('/stock/update', async (req, res) => {
+  if (!req.query.symbol) { return res.status(400).json({}); }
+  const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
+  const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
+  if (!symbol) { return res.status(400).json({}); }
+
+  try {
+    return_data = await getStockDetailAndSummary(symbol);
+    if (Object.keys(return_data).length === 0) {
+      return res.json({});
+    }
+    return res.json(return_data);
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({});
+  }
+});
+
 app.use(express.static(__dirname + '/dist/web/browser'));
 
 app.get('*', function (req, res) {

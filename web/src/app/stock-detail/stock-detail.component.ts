@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
+import { interval, Subscription } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -25,8 +26,10 @@ import { NewsDetailDialogComponent } from '../news-detail-dialog/news-detail-dia
   templateUrl: './stock-detail.component.html',
   styleUrls: ['./stock-detail.component.css']
 })
-export class StockDetailComponent {
+export class StockDetailComponent implements OnInit, OnDestroy {
   stock!: string;
+
+  private updateSubscription: Subscription | null = null;
 
   showLoading = false;
   showDetailView = false;
@@ -67,6 +70,12 @@ export class StockDetailComponent {
     });
   }
 
+  ngOnDestroy() {
+    if (this.updateSubscription) {
+      this.updateSubscription.unsubscribe();
+    }
+  }
+
   loadData() {
     this.showLoading = true;
     this.showDetailView = false;
@@ -98,6 +107,11 @@ export class StockDetailComponent {
             }
             this.stockService.updateStockData(this.stockData);
             this.fn_showDetailView();
+            if (this.stockData.detail.status) {
+              this.updateSubscription = interval(15000).subscribe(() => {
+                this.updateViewData();
+              });
+            }
           },
           error: (error) => {
             console.error('Error fetching stock data:', error);
@@ -120,6 +134,39 @@ export class StockDetailComponent {
     this.updateMainCharts();
     this.updateInsightsTrendsCharts();
     this.updateInsightsEPSCharts();
+  }
+
+  updateViewData() {
+    try {
+      const url = this.serverService.getServerUrl() + '/stock/update?symbol=' + this.stock;
+      this.http.get<any>(url).subscribe({
+        next: (result) => {
+          if (Object.keys(this.stockData).length === 0) {
+            return;
+          }
+          this.stockData.detail = result.detail;
+          this.stockData.summary = result.summary;
+          this.stockData.summaryCharts = result.summaryCharts;
+          this.stockService.updateStockData(this.stockData);
+          if (this.stockData.detail.status) {
+            this.detailDate = this.stockData.detail.timestamp;
+          } else {
+            this.detailDate = new Date();
+          }
+          this.updateSummaryCharts();
+          if (!this.stockData.detail.status) {
+            if (this.updateSubscription) {
+              this.updateSubscription.unsubscribe();
+            }
+          }
+        },
+        error: (error) => {
+          console.error('Error update stock data:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error update stock data:', error);
+    }
   }
 
   fn_showDetailView() {
@@ -358,16 +405,16 @@ export class StockDetailComponent {
       series: [{
         name: 'Actual',
         marker: {
-            symbol: 'circle'
+          symbol: 'circle'
         },
         data: this.stockData.insightsEPS.actual
-    }, {
+      }, {
         name: 'Estimate',
         marker: {
-            symbol: 'diamond'
+          symbol: 'diamond'
         },
         data: this.stockData.insightsEPS.estimate
-    }] as Highcharts.SeriesSplineOptions[]
+      }] as Highcharts.SeriesSplineOptions[]
     };
   }
 }
