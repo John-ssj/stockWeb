@@ -6,7 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { ServerService } from '../server.service';
 
-interface StockItem {
+interface WatchListItem {
   stock: string;
   name: string;
   currentPrice: number;
@@ -22,7 +22,7 @@ interface StockItem {
   styleUrls: ['./watchlist.component.css']
 })
 export class WatchlistComponent implements OnInit {
-  watchListData: StockItem[] = [];
+  watchListData: WatchListItem[] = [];
 
   showLoading = false;
   showEmptyPrompt = false;
@@ -40,14 +40,12 @@ export class WatchlistComponent implements OnInit {
 
   getWatchList() {
     try {
-      console.log('getWatchList');
       const url = this.serverService.getServerUrl() + '/financial/getWatchList';
       this.http.get<any>(url).subscribe({
         next: (result) => {
           this.showLoading = false;
           this.showEmptyPrompt = false;
-          console.log('get data: ', result);
-          if (Object.keys(result).length === 0 || result.watchList.length === 0) {
+          if (Object.keys(result).length === 0 || Object.keys(result.watchList).length === 0) {
             this.watchListData = [];
             this.showEmptyPrompt = true;
             return;

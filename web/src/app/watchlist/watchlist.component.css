@@ -19,7 +19,7 @@
 
 .watchlist-title {
     font-size: 40px;
-    font-weight: 300;
+    font-weight: 400;
     color: #242426;
     text-align: left;
     margin: 20px 10%;
@@ -38,7 +38,6 @@
 }
 
 .item-detail {
-    display: flex;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -65,6 +64,11 @@
 }
 
 @media (max-width: 768px) {
+    .watchlist-title {
+        font-size: 32px;
+        margin: 20px 5px;
+    }
+
     .watchlist-item-content {
         margin: 10px 5%;
         padding: 10px;

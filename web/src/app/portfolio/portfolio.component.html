@@ -1,0 +1,103 @@
+<div *ngIf="showBuyPrompt" class="alert alert-success prompt-container">
+    <div class="prompt-message">
+        {{ stock }}&nbsp;bought successfully.
+    </div>
+    <span class="bi bi-x close-icon" (click)="closeBuyPrompt()"></span>
+</div>
+
+<div *ngIf="showSellPrompt" class="alert alert-danger prompt-container">
+    <div class="prompt-message">
+        {{ stock }}&nbsp;sold successfully.
+    </div>
+    <span class="bi bi-x close-icon" (click)="closeSellPrompt()"></span>
+</div>
+
+<div class="portfolio-title">
+    My Portfolio
+</div>
+
+<div *ngIf="showLoading" class="loadingView"><mat-spinner class="custom-spinner"></mat-spinner></div>
+
+<div *ngIf="showPortfolioView">
+    <div class="wallet-title">
+        Money in Wallet: ${{ wallet }}
+    </div>
+
+    <div *ngIf="showEmptyPrompt" class="alert alert-warning prompt-container">
+        <div class="prompt-message">
+            Currently you don't have any stock.
+        </div>
+    </div>
+
+    <div *ngFor="let stockItem of portfolioData">
+        <div class="portfolio-item-content">
+            <div class="item-top">
+                <div class="stock">{{ stockItem.stock }}</div>
+                <div class="name">{{ stockItem.name }}</div>
+            </div>
+            <div class="item-detail">
+                <div class="row" style="margin: 10px 0;">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="key-item">
+                                    Quantity:
+                                </div>
+                                <div class="key-item">
+                                    Avg. Cost / share:
+                                </div>
+                                <div class="key-item">
+                                    Total Cost:
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="value-item">
+                                    {{ stockItem.quantity }}
+                                </div>
+                                <div class="value-item">
+                                    {{ stockItem.avgCost }}
+                                </div>
+                                <div class="value-item">
+                                    {{ stockItem.totalCost }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="key-item">
+                                    Change:
+                                </div>
+                                <div class="key-item">
+                                    Current Price:
+                                </div>
+                                <div class="key-item">
+                                    Market Value:
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="value-item" [ngStyle]="{'color': stockItem.change > 0 ? 'green' : 'red'}">
+                                    <span *ngIf="stockItem.change > 0" class="bi bi-caret-up-fill"></span>
+                                    <span *ngIf="stockItem.change < 0" class="bi bi-caret-down-fill"></span>
+                                    {{ stockItem.change }}
+                                </div>
+                                <div class="value-item" [ngStyle]="{'color': stockItem.change > 0 ? 'green' : 'red'}">
+                                    {{ stockItem.currentPrice }}
+                                </div>
+                                <div class="value-item" [ngStyle]="{'color': stockItem.change > 0 ? 'green' : 'red'}">
+                                    {{ stockItem.marketValue }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item-bottom">
+                <button class="btn btn-primary">Buy</button>
+                <button class="btn btn-danger">Sell</button>
+            </div>
+        </div>
+    </div>
+
+</div>

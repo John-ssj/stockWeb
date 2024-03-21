@@ -407,12 +407,16 @@ async function getPortfolio() {
       const wallet = Number(profile.wallet.toFixed(2));
       const portfolioData = await Promise.all(profile.portfolio.map(async (item) => {
         const priceData = await getFinancialPrice(item.stock);
+        const avgCost = item.totalCost / item.quantity;
         return {
           "stock": item.stock,
           "name": item.name,
-          "Quantity": item.quantity,
-          "TotalCost": Number(item.totalCost.toFixed(2)),
-          "currentPrice": Number(priceData.currentPrice.toFixed(2))
+          "quantity": item.quantity.toFixed(2),
+          "totalCost": Number(item.totalCost.toFixed(2)),
+          "avgCost": Number(avgCost.toFixed(2)),
+          "currentPrice": Number(priceData.currentPrice.toFixed(2)),
+          "change": Number((priceData.currentPrice - avgCost).toFixed(2)),
+          "marketValue": Number((priceData.currentPrice * item.quantity).toFixed(2)),
         };
       }));
       return { "wallet": wallet, "portfolio": portfolioData };

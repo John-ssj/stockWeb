@@ -54,7 +54,7 @@
     height: auto;
 }
 
-.detail-but-sell-container {
+.detail-buy-sell-container {
     display: flex;
     justify-content: space-between;
     gap: 10px;
