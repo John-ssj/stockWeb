@@ -1,31 +1,59 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// 定义观察列表项的Schema
 const watchListItemSchema = new Schema({
-  stock: String, // 股票代码
-  name: String,  // 股票名称
+    stock: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    name: {
+        type: String,
+        required: true
+    }
 });
 
-// 定义投资组合项的Schema
 const portfolioItemSchema = new Schema({
-  stock: String,     // 股票代码
-  name: String,      // 股票名称
-  quantity: Number,  // 持股数量
-  totalCost: Number, // 总成本
+    stock: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true
+    },
+    totalCost: {
+        type: Number,
+        required: true
+    },
 });
 
-// 定义用户金融投资概况的Schema
 const userFinancialProfileSchema = new Schema({
-  wallet: {
-    type: Number,
-    default: 0,  // 默认钱包余额为0
-  },
-  watchList: [watchListItemSchema], // 观察列表，数组形式
-  portfolio: [portfolioItemSchema], // 投资组合，数组形式
+    id: {
+        type: Number,
+        required: true,
+        unique: true
+    },
+    wallet: {
+        type: Number,
+        default: 25000,
+    },
+    watchList: {
+        type: [watchListItemSchema],
+        required: true,
+        default: []
+    },
+    portfolio: {
+        type: [portfolioItemSchema],
+        required: true,
+        default: []
+    },
 });
 
-// 创建模型
 const UserFinancialProfile = mongoose.model('UserFinancialProfile', userFinancialProfileSchema);
 
 module.exports = UserFinancialProfile;

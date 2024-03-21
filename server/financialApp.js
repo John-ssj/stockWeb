@@ -1,13 +1,8 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const UserFinancialProfile = require('./UserFinancialProfile');
 
-// MongoDB 连接
-mongoose.connect('mongodb+srv://hayleyliu:InB2FwIu9o1Ny3hU@stockwebdb.k3nzcez.mongodb.net/?retryWrites=true&w=majority&appName=stockWebDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const bodyParser = require('body-parser');
+
+
 
 const app = express();
 const port = 3000;

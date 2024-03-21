@@ -1,6 +1,13 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
+const UserFinancialProfile = require('./UserFinancialProfile.js');
+
+// MongoDB 连接
+mongoose.connect('mongodb+srv://hayleyliu:InB2FwIu9o1Ny3hU@stockwebdb.k3nzcez.mongodb.net/StockWeb?retryWrites=true&w=majority&appName=stockWebDB', {
+  useNewUrlParser: true
+});
 
 const app = express();
 const port = 8080;
@@ -44,22 +51,23 @@ app.get('/stock/search', async (req, res) => {
   }
 });
 
-const getStockSummaryCharts = async (stock, date) => {
+async function getStockSummaryCharts(stock, date) {
   const t = new Date(Number(date));
   const time_to = t.toISOString().split('T')[0];
   t.setDate(t.getDate() - 1);
   const time_from = t.toISOString().split('T')[0];
   const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/60/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+  let data = {};
   try {
     const response = await fetch(target_url);
-    const data = await response.json();
+    data = await response.json();
     if (Object.keys(data).length === 0) {
       return {};
     } else {
-      extracted_data = data.results.map(item => {
+      const extracted_data = data.results.map(item => {
         return [item.t, Number(item.vw.toFixed(2))]
       });
-      selected_data = extracted_data.length <= 24 ? extracted_data : extracted_data.slice(-24);
+      const selected_data = extracted_data.length <= 24 ? extracted_data : extracted_data.slice(-24);
       return selected_data;
     }
   } catch (error) {
@@ -70,7 +78,7 @@ const getStockSummaryCharts = async (stock, date) => {
 }
 
 // 这些函数应该在调用前确保stock值有效
-const getStockDetailAndSummary = async (stock) => {
+async function getStockDetailAndSummary(stock) {
   const target_url_1 = `https://finnhub.io/api/v1/stock/profile2?symbol=${stock}&token=${api_key_finnhub}`;
   const target_url_2 = `https://finnhub.io/api/v1/quote?symbol=${stock}&token=${api_key_finnhub}`;
   const target_url_3 = `https://finnhub.io/api/v1/stock/peers?symbol=${stock}&token=${api_key_finnhub}`;
@@ -103,8 +111,8 @@ const getStockDetailAndSummary = async (stock) => {
           "name": data_1["name"],
           "code": data_1["exchange"],
           "lastPrice": data_2["c"],
-          "change": data_2["d"],
-          "changePercent": Number(data_2["dp"].toFixed(2)),
+          "change": data_2["d"] ? data_2["d"] : 0,
+          "changePercent": data_2["dp"] ? Number(data_2["dp"].toFixed(2)) : 0,
           "timestamp": data_2["t"] + '000',
           "status": marketStatus
         },
@@ -127,23 +135,24 @@ const getStockDetailAndSummary = async (stock) => {
   }
 };
 
-const getStockNews = async (stock) => {
-  t = new Date();
+async function getStockNews(stock) {
+  let t = new Date();
   const time_to = t.toISOString().split('T')[0];
   t.setDate(t.getDate() - 7);
   const time_from = t.toISOString().split('T')[0];
   const target_url = `https://finnhub.io/api/v1/company-news?symbol=${stock}&from=${time_from}&to=${time_to}&token=${api_key_finnhub}`;
+  let selected_data = {};
   try {
     const response = await fetch(target_url);
     const data = await response.json();
     if (Object.keys(data).length === 0) {
       return [];
     } else {
-      filtered_data = data.filter(item =>
+      const filtered_data = data.filter(item =>
         item.headline && item.image && item.source && item.datetime && item.summary && item.url
       );
       selected_data = filtered_data.length <= 20 ? filtered_data : filtered_data.slice(0, 20);
-      extracted_data = selected_data.map(item => {
+      const extracted_data = selected_data.map(item => {
         const formattedDate = formatDate(new Date(item.datetime * 1000));
         return {
           "headline": item.headline,
@@ -163,30 +172,29 @@ const getStockNews = async (stock) => {
   }
 };
 
-const getStockCharts = async (stock) => {
-  t = new Date();
+async function getStockCharts(stock) {
+  let t = new Date();
   const time_to = t.toISOString().split('T')[0];
   t.setFullYear(t.getFullYear() - 2);
   const time_from = t.toISOString().split('T')[0];
   const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/1/day/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
-  data = {};
+  let data = {};
   try {
     const response = await fetch(target_url);
     data = await response.json();
     if (Object.keys(data).length === 0) {
       return {};
     } else {
-      ohlc = data.results.map(item => {
+      const ohlc = data.results.map(item => {
         return [item.t, Number(item.o.toFixed(2)), Number(item.h.toFixed(2)), Number(item.l.toFixed(2)), Number(item.c.toFixed(2))]
       });
-      volume = data.results.map(item => {
+      const volume = data.results.map(item => {
         return [item.t, Number(item.v.toFixed(2))]
       });
-      extracted_data = {
+      return {
         "ohlc": ohlc,
         "volume": volume
       };
-      return extracted_data;
     }
   } catch (error) {
     console.error('Error:', error);
@@ -195,9 +203,9 @@ const getStockCharts = async (stock) => {
   }
 };
 
-const getStockInsights = async (stock) => {
+async function getStockInsights(stock) {
   const target_url = `https://finnhub.io/api/v1/stock/insider-sentiment?symbol=${stock}&from=2022-01-01&token=${api_key_finnhub}`;
-  filtered_data = {};
+  let filtered_data = {};
   try {
     const response = await fetch(target_url);
     const data = await response.json();
@@ -238,9 +246,9 @@ const getStockInsights = async (stock) => {
   }
 };
 
-const getStockInsightsTrendsCharts = async (stock) => {
+async function getStockInsightsTrendsCharts(stock) {
   const target_url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${stock}&token=${api_key_finnhub}`;
-  data = {};
+  let data = {};
   try {
     const response = await fetch(target_url);
     data = await response.json();
@@ -282,9 +290,9 @@ const getStockInsightsTrendsCharts = async (stock) => {
   }
 }
 
-const getStockInsightsEPSCharts = async (stock) => {
+async function getStockInsightsEPSCharts(stock) {
   const target_url = `https://finnhub.io/api/v1/stock/earnings?symbol=${stock}&token=${api_key_finnhub}`;
-  data = {};
+  let data = {};
   try {
     const response = await fetch(target_url);
     data = await response.json();
@@ -296,11 +304,11 @@ const getStockInsightsEPSCharts = async (stock) => {
       let estimate = [];
 
       data.forEach(item => {
-        periodAndSurprise_list.push(item.period + "<br>surprise: " + item.surprise);
-        actual.push(item.actual);
+        periodAndSurprise_list.push(item.period + "<br>surprise: " + (item.surprise ? item.surprise : 0));
+        actual.push(item.actual ? item.actual : 0);
         estimate.push(item.estimate);
       });
-
+      ƒ
       const selected_data = {
         "periodAndSurprise": periodAndSurprise_list,
         "actual": actual,
@@ -323,7 +331,7 @@ app.get('/stock/company', async (req, res) => {
   if (!symbol) { return res.status(400).json({}); }
 
   try {
-    return_data = await getStockDetailAndSummary(symbol);
+    let return_data = await getStockDetailAndSummary(symbol);
     if (Object.keys(return_data).length === 0) {
       return res.json({});
     }
@@ -358,16 +366,181 @@ app.get('/stock/update', async (req, res) => {
   if (!symbol) { return res.status(400).json({}); }
 
   try {
-    return_data = await getStockDetailAndSummary(symbol);
+    let return_data = await getStockDetailAndSummary(symbol);
     if (Object.keys(return_data).length === 0) {
       return res.json({});
     }
-    summaryCharts = await getStockSummaryCharts(symbol, return_data.detail.timestamp);
+    const summaryCharts = await getStockSummaryCharts(symbol, return_data.detail.timestamp);
     return_data["summaryCharts"] = summaryCharts;
     return res.json(return_data);
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({});
+  }
+});
+
+// watchlist和portfolio的操作
+
+async function getStockName(stock) {
+  const target_url = `https://finnhub.io/api/v1/stock/profile2?symbol=${stock}&token=${api_key_finnhub}`;
+  const response = await fetch(target_url);
+  const data = await response.json();
+  return data["name"];
+}
+
+async function getFinancialPrice(stock) {
+  const target_url = `https://finnhub.io/api/v1/quote?symbol=${stock}&token=${api_key_finnhub}`;
+  const response = await fetch(target_url);
+  const data = await response.json();
+  return {
+    "currentPrice": data["c"],
+    "change": data["d"],
+    "changePercent": data["dp"] ? Number(data["dp"].toFixed(2)) : 0
+  };
+}
+
+app.get('/financial/init', async (req, res) => {
+  try {
+    await UserFinancialProfile.deleteMany({});
+
+    const newUserFinancialProfile = new UserFinancialProfile({
+      id: 0,
+      wallet: 25000,
+      watchList: [],
+      portfolio: [],
+    });
+
+    await newUserFinancialProfile.save();
+
+    res.send({ "success": true });
+  } catch (error) {
+    console.error('Error initializing user financial profile:', error);
+    res.status(500).send({});
+  }
+});
+
+app.get('/financial/getWallet', async (req, res) => {
+  try {
+    const profile = await UserFinancialProfile.findOne({ id: 0 });
+    if (profile) {
+      res.json({ "wallet": profile.wallet });
+    } else {
+      res.status(404).send({});
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send({});
+  }
+});
+
+app.get('/financial/getWatchList', async (req, res) => {
+  try {
+    const profile = await UserFinancialProfile.findOne({ id: 0 });
+    if (profile) {
+      const watchListData = await Promise.all(profile.watchList.map(async (item) => {
+        const priceData = await getFinancialPrice(item.stock);
+        return {
+          "stock": item.stock,
+          "name": item.name,
+          "currentPrice": priceData.currentPrice,
+          "change": priceData.change,
+          "changePercent": priceData.changePercent
+        };
+      }));
+      res.json({ "watchList": watchListData });
+    } else {
+      res.status(404).send({});
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send({});
+  }
+});
+
+app.get('/financial/getPortfolio', async (req, res) => {
+  try {
+    const profile = await UserFinancialProfile.findOne({ id: 0 });
+    if (profile) {
+      const portfolioData = await Promise.all(profile.portfolio.map(async (item) => {
+        const priceData = await getFinancialPrice(item.stock);
+        return {
+          "stock": item.stock,
+          "name": item.name,
+          "Quantity": item.quantity,
+          "TotalCost": item.totalCost,
+          "currentPrice": priceData.currentPrice
+        };
+      }));
+      res.json({ "portfolio": portfolioData });
+    } else {
+      res.status(404).send({});
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send({});
+  }
+});
+
+app.get('/financial/getInfo', async (req, res) => {
+  if (!req.query.symbol) { return res.json({}); }
+  const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
+  const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
+  if (!symbol) { res.json({}); }
+
+  try {
+    const profile = await UserFinancialProfile.findOne({ id: 0 });
+    const watchListExists = profile.watchList.some(item => item.stock === symbol);
+    const portfolioExists = profile.watchList.some(item => item.stock === symbol);
+    res.json({ "watchList": watchListExists, "portfolio": portfolioExists });
+  } catch (error) {
+    console.error('Error:', error);
+    res.json({});
+  }
+});
+
+app.get('/financial/addWatchList', async (req, res) => {
+  if (!req.query.symbol) { return res.status(400).json({}); }
+  const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
+  const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
+  if (!symbol) { return res.status(400).json({}); }
+
+  try {
+    const profile = await UserFinancialProfile.findOne({ id: 0 });
+    const watchListExists = profile.watchList.some(item => item.stock === symbol);
+    if (watchListExists) { return res.json({}); }
+    const stock_name = await getStockName(symbol);
+    const result = await UserFinancialProfile.updateOne({ id: 0 }, {
+      $push: { watchList: { stock: symbol, name: stock_name } }
+    });
+    if (result.modifiedCount > 0) {
+      res.json({ "success": true });
+    } else {
+      res.json({});
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.json({});
+  }
+});
+
+app.get('/financial/removeWatchList', async (req, res) => {
+  if (!req.query.symbol) { return res.status(400).json({}); }
+  const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
+  const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
+  if (!symbol) { return res.status(400).json({}); }
+
+  try {
+    const result = await UserFinancialProfile.updateOne({ id: 0 }, {
+      $pull: { watchList: { stock: symbol } }
+    });
+    if (result.modifiedCount > 0) {
+      res.json({ "success": true });
+    } else {
+      res.json({});
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.json({});
   }
 });
 
