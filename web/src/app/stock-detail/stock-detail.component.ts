@@ -45,6 +45,11 @@ export class StockDetailComponent {
   mainCharts: typeof Highcharts = Highcharts;
   mainChartsOptions: Highcharts.Options = {};
 
+  insightsTrendsCharts: typeof Highcharts = Highcharts;
+  insightsTrendsChartsOptions: Highcharts.Options = {};
+
+  insightsEPSCharts: typeof Highcharts = Highcharts;
+  insightsEPSChartsOptions: Highcharts.Options = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -113,6 +118,8 @@ export class StockDetailComponent {
     }
     this.updateSummaryCharts();
     this.updateMainCharts();
+    this.updateInsightsTrendsCharts();
+    this.updateInsightsEPSCharts();
   }
 
   fn_showDetailView() {
@@ -266,6 +273,101 @@ export class StockDetailComponent {
           enabled: false
         }
       }] as Highcharts.SeriesOptionsType[]
+    };
+  }
+
+  updateInsightsTrendsCharts() {
+    this.insightsTrendsChartsOptions = {
+      chart: {
+        type: 'column',
+        backgroundColor: '#f8f8f8'
+      },
+
+      title: {
+        text: 'Recommendation Trends'
+      },
+
+      xAxis: {
+        categories: this.stockData.insightsTrends.period,
+      },
+
+      yAxis: {
+        min: 0,
+        title: {
+          text: '#Analysis'
+        },
+        stackLabels: {
+          enabled: true
+        }
+      },
+
+      plotOptions: {
+        column: {
+          stacking: 'normal',
+          dataLabels: {
+            enabled: true
+          }
+        }
+      },
+
+      series: [{
+        name: 'Strong Buy',
+        data: this.stockData.insightsTrends.strongBuy,
+        color: '#207a3f'
+      }, {
+        name: 'Buy',
+        data: this.stockData.insightsTrends.buy,
+        color: '#37bf5f'
+      }, {
+        name: 'Hold',
+        data: this.stockData.insightsTrends.hold,
+        color: '#c2951f'
+      }, {
+        name: 'Sell',
+        data: this.stockData.insightsTrends.sell,
+        color: '#f66768'
+      }, {
+        name: 'Strong Sell',
+        data: this.stockData.insightsTrends.strongSell,
+        color: '#8d3838'
+      }] as Highcharts.SeriesColumnOptions[]
+    };
+  }
+
+  updateInsightsEPSCharts() {
+    this.insightsEPSChartsOptions = {
+      chart: {
+        type: 'spline',
+        backgroundColor: '#f8f8f8'
+      },
+
+      title: {
+        text: 'Historical EPS Surprises'
+      },
+
+      xAxis: {
+        categories: this.stockData.insightsEPS.periodAndSurprise,
+      },
+
+      yAxis: {
+        title: {
+          text: 'Quarterly EPS'
+        }
+      },
+
+      series: [{
+        name: 'Actual',
+        marker: {
+            symbol: 'circle'
+        },
+        data: this.stockData.insightsEPS.actual
+    }, {
+        name: 'Estimate',
+        marker: {
+            symbol: 'diamond'
+        },
+        data: this.stockData.insightsEPS.estimate
+    }] as Highcharts.SeriesSplineOptions[]
     };
   }
 }

@@ -236,6 +236,84 @@ const getStockInsights = async (stock) => {
   }
 };
 
+const getStockInsightsTrendsCharts = async (stock) => {
+  const target_url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${stock}&token=${api_key_finnhub}`;
+  data = {};
+  try {
+    const response = await fetch(target_url);
+    data = await response.json();
+    if (Object.keys(data).length === 0) {
+      return {};
+    } else {
+      let period_list = [];
+      let buy = [];
+      let hold = [];
+      let sell = [];
+      let strongBuy = [];
+      let strongSell = [];
+
+      data.forEach(item => {
+        const period = item.period.substring(0, 7);
+        period_list.push(period);
+        buy.push(item.buy);
+        hold.push(item.hold);
+        sell.push(item.sell);
+        strongBuy.push(item.strongBuy);
+        strongSell.push(item.strongSell);
+      });
+
+      const selected_data = {
+        "period": period_list,
+        "buy": buy,
+        "hold": hold,
+        "sell": sell,
+        "strongBuy": strongBuy,
+        "strongSell": strongSell
+      };
+
+      return selected_data;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    console.log(data);
+    return {};
+  }
+}
+
+const getStockInsightsEPSCharts = async (stock) => {
+  const target_url = `https://finnhub.io/api/v1/stock/earnings?symbol=${stock}&token=${api_key_finnhub}`;
+  data = {};
+  try {
+    const response = await fetch(target_url);
+    data = await response.json();
+    if (Object.keys(data).length === 0) {
+      return {};
+    } else {
+      let periodAndSurprise_list = [];
+      let actual = [];
+      let estimate = [];
+
+      data.forEach(item => {
+        periodAndSurprise_list.push(item.period + "<br>surprise: " + item.surprise);
+        actual.push(item.actual);
+        estimate.push(item.estimate);
+      });
+
+      const selected_data = {
+        "periodAndSurprise": periodAndSurprise_list,
+        "actual": actual,
+        "estimate": estimate
+      };
+
+      return selected_data;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    console.log(data);
+    return {};
+  }
+}
+
 app.get('/stock/company', async (req, res) => {
   if (!req.query.symbol) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
@@ -250,9 +328,13 @@ app.get('/stock/company', async (req, res) => {
     stockNews_data = await getStockNews(symbol);
     stockCharts_data = await getStockCharts(symbol);
     stockInsights_data = await getStockInsights(symbol);
+    stockInsightsTrendsCharts_data = await getStockInsightsTrendsCharts(symbol);
+    stockInsightsEPSCharts_data = await getStockInsightsEPSCharts(symbol);
     return_data["news"] = stockNews_data;
     return_data["charts"] = stockCharts_data;
     return_data["insights"] = stockInsights_data;
+    return_data["insightsTrends"] = stockInsightsTrendsCharts_data;
+    return_data["insightsEPS"] = stockInsightsEPSCharts_data;
     return res.json(return_data);
   } catch (error) {
     console.error('Error:', error);

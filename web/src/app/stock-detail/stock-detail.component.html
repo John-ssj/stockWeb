@@ -153,10 +153,14 @@
                 <div class="col-md-2">
                 </div>
                 <div class="col-md-6">
-                    hello
+                    <highcharts-chart [Highcharts]="insightsTrendsCharts" [options]="insightsTrendsChartsOptions"
+                        class="insights-charts">
+                    </highcharts-chart>
                 </div>
                 <div class="col-md-6">
-                    hello
+                    <highcharts-chart [Highcharts]="insightsEPSCharts" [options]="insightsEPSChartsOptions"
+                        class="insights-charts">
+                    </highcharts-chart>
                 </div>
             </div>
         </mat-tab>
