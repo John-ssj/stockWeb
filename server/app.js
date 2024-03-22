@@ -394,8 +394,8 @@ async function getFinancialPrice(stock) {
   const response = await fetch(target_url);
   const data = await response.json();
   return {
-    "currentPrice": data["c"],
-    "change": data["d"],
+    "currentPrice": Number(data["c"].toFixed(2)),
+    "change": Number(data["d"].toFixed(2)),
     "changePercent": data["dp"] ? Number(data["dp"].toFixed(2)) : 0
   };
 }
@@ -509,6 +509,23 @@ app.get('/financial/getInfo', async (req, res) => {
   }
 });
 
+app.get('/financial/getPrice', async (req, res) => {
+  if (!req.query.symbol) { return res.json({}); }
+  const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
+  const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
+  if (!symbol) { res.json({}); }
+
+  try {
+    const profile = await UserFinancialProfile.findOne({ id: 0 });
+    const portfolioItem = profile.portfolio.find(item => item.stock === symbol);
+    const quantity = portfolioItem ? portfolioItem.quantity : 0;
+    const price = await getFinancialPrice(symbol);
+    res.json({ "wallet": Number(profile.wallet.toFixed(2)), "currentPrice": price.currentPrice, "quantity": quantity });
+  } catch (error) {
+    res.json({});
+  }
+});
+
 app.get('/financial/addWatchList', async (req, res) => {
   if (!req.query.symbol) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
@@ -585,13 +602,19 @@ app.get('/financial/buy', async (req, res) => {
         }
         profile.wallet -= cost;
         await profile.save();
-        const portfolio_data = await getPortfolio();
+        const portfolio_data = await getPortfolio()
+        portfolio_data["success"] = true;
         res.json(portfolio_data);
+        return;
       }
     } else {
-      res.status(404).send({});
+      const portfolio_data = await getPortfolio();
+      portfolio_data["success"] = false;
+      res.json(portfolio_data);
+      return;
     }
   }
+  res.status(500).send({});
 });
 
 app.get('/financial/sell', async (req, res) => {
@@ -604,9 +627,13 @@ app.get('/financial/sell', async (req, res) => {
 
   const profile = await UserFinancialProfile.findOne({ id: 0 });
   if (profile) {
-    const wallet = profile.wallet;
     const portfolioItem = profile.portfolio.find(item => item.stock === symbol);
-    if (!portfolioItem || portfolioItem.quantity < quantity) { return res.status(404).json({}); }
+    if (!portfolioItem || portfolioItem.quantity < quantity) {
+      const portfolio_data = await getPortfolio();
+      portfolio_data["success"] = false;
+      res.json(portfolio_data);
+      return;
+    }
     const priceData = await getFinancialPrice(symbol);
     const cost = priceData.currentPrice * quantity;
     portfolioItem.quantity -= quantity;
@@ -619,10 +646,16 @@ app.get('/financial/sell', async (req, res) => {
     await profile.save();
 
     const portfolio_data = await getPortfolio();
+    portfolio_data["success"] = true;
     res.json(portfolio_data);
+    return;
   } else {
-    res.status(404).send({});
+    const portfolio_data = await getPortfolio();
+    portfolio_data["success"] = false;
+    res.json(portfolio_data);
+    return;
   }
+  res.status(500).send({});
 });
 
 app.use(express.static(__dirname + '/dist/web/browser'));

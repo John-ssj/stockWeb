@@ -19,6 +19,7 @@ import { StockService } from '../stock.service';
 import { ServerService } from '../server.service';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { NewsDetailDialogComponent } from '../news-detail-dialog/news-detail-dialog.component'; // 引入对话框组件
+import { BuySellDialogComponent } from '../buy-sell-dialog/buy-sell-dialog.component'; // 引入对话框组件
 @Component({
   selector: 'app-stock-detail',
   standalone: true,
@@ -460,6 +461,54 @@ export class StockDetailComponent implements OnInit, OnDestroy {
               this.showUncollectPrompt = false;
             }, 5000);
           }
+        }
+      });
+    } catch (error) {
+    }
+  }
+
+  buySellStock(buy: boolean) {
+    try {
+      const url = this.serverService.getServerUrl() + '/financial/getPrice?symbol=' + this.stock;
+      this.http.get<any>(url).subscribe({
+        next: (result) => {
+          if (Object.keys(result).length !== 0) {
+            const dialogRef = this.dialog.open(BuySellDialogComponent, {
+              width: '480px',
+              position: {
+                top: '30px',
+              },
+              data: {
+                "buy": buy,
+                "stock": this.stock,
+                "currentPrice": result.currentPrice,
+                "wallet": result.wallet,
+                "quantity": result.quantity
+              }
+            });
+            dialogRef.afterClosed().subscribe(result => {
+              const url = this.serverService.getServerUrl() + '/financial/' + (buy ? 'buy' : 'sell') + '?symbol=' + this.stock + '&quantity=' + result;
+              this.http.get<any>(url).subscribe({
+                next: (result) => {
+                  if (Object.keys(result).length !== 0 && result.success) {
+                    this.showBuyPrompt = buy;
+                    this.showSellPrompt = !buy;
+                    setTimeout(() => {
+                      this.showBuyPrompt = false;
+                      this.showSellPrompt = false;
+                    }, 5000);
+                  }
+                  this.getCollectAndSellInfo();
+                },
+                error: (error) => {
+                  console.error('Error:', error);
+                }
+              });
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error:', error);;
         }
       });
     } catch (error) {

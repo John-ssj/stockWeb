@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 
 import { ServerService } from '../server.service';
-
+import { BuySellDialogComponent } from '../buy-sell-dialog/buy-sell-dialog.component';
 interface PortfolioItem {
   stock: string;
   name: string;
@@ -39,7 +40,8 @@ export class PortfolioComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private serverService: ServerService
+    private serverService: ServerService,
+    public dialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -76,6 +78,58 @@ export class PortfolioComponent implements OnInit {
       this.showLoading = false;
       this.showPortfolioView = true;
       this.showEmptyPrompt = true;
+    }
+  }
+
+  buySellStock(buy: boolean, stock: string) {
+    try {
+      const url = this.serverService.getServerUrl() + '/financial/getPrice?symbol=' + stock;
+      this.http.get<any>(url).subscribe({
+        next: (result) => {
+          if (Object.keys(result).length !== 0) {
+            const dialogRef = this.dialog.open(BuySellDialogComponent, {
+              width: '480px',
+              position: {
+                top: '30px',
+              },
+              data: {
+                "buy": buy,
+                "stock": this.stock,
+                "currentPrice": result.currentPrice,
+                "wallet": result.wallet,
+                "quantity": result.quantity
+              }
+            });
+            dialogRef.afterClosed().subscribe(result => {
+              const url = this.serverService.getServerUrl() + '/financial/' + (buy ? 'buy' : 'sell') + '?symbol=' + stock + '&quantity=' + result;
+              this.http.get<any>(url).subscribe({
+                next: (result) => {
+                  if (Object.keys(result).length !== 0) {
+                    if (result.success) {
+                      this.showBuyPrompt = buy;
+                      this.showSellPrompt = !buy;
+                      setTimeout(() => {
+                        this.showBuyPrompt = false;
+                        this.showSellPrompt = false;
+                      }, 5000);
+                    }
+                    this.wallet = result.wallet;
+                    this.portfolioData = result.portfolio;
+                    this.showEmptyPrompt = (this.portfolioData.length === 0);
+                  }
+                },
+                error: (error) => {
+                  console.error('Error:', error);
+                }
+              });
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error:', error);;
+        }
+      });
+    } catch (error) {
     }
   }
 

@@ -1,6 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatDialogModule } from '@angular/material/dialog';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-news-detail-dialog',
@@ -9,7 +8,7 @@ import { MatDialogModule } from '@angular/material/dialog';
   templateUrl: './news-detail-dialog.component.html',
   styleUrls: ['./news-detail-dialog.component.css']
 })
-export class NewsDetailDialogComponent {
+export class NewsDetailDialogComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public news: any) { }
   twitterShareUrl: string = "";
   facebookShareUrl: string = "";

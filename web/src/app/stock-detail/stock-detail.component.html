@@ -48,8 +48,8 @@
                 <div class="detail-text-name">{{ stockData.detail.name }}</div>
                 <div class="detail-text-code">{{ stockData.detail.code }}</div>
                 <div class="detail-buy-sell-container">
-                    <button class="btn btn-success">Buy</button>
-                    <button *ngIf="sellBtn" class="btn btn-danger">Sell</button>
+                    <button class="btn btn-success" (click)="buySellStock(true)">Buy</button>
+                    <button *ngIf="sellBtn" class="btn btn-danger" (click)="buySellStock(false)">Sell</button>
                 </div>
             </div>
 

@@ -94,8 +94,8 @@
                 </div>
             </div>
             <div class="item-bottom">
-                <button class="btn btn-primary">Buy</button>
-                <button class="btn btn-danger">Sell</button>
+                <button class="btn btn-primary" (click)="buySellStock(true, stockItem.stock)">Buy</button>
+                <button class="btn btn-danger" (click)="buySellStock(false, stockItem.stock)">Sell</button>
             </div>
         </div>
     </div>

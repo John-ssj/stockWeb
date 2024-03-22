@@ -1,0 +1,30 @@
+<div class="header">
+    <div>
+        <div class="stock">{{ stockData.stock }}</div>
+    </div>
+    <span [mat-dialog-close]="true" class="bi bi-x" style="font-size: 18px; color: blue;"></span>
+</div>
+
+<div class="line"></div>
+
+<div class="detail-info">Current Price:&nbsp;{{ stockData.currentPrice }}</div>
+<div class="detail-info">Money in Wallet:&nbsp;{{ stockData.wallet }}</div>
+<div class="detail-info">
+    Quantity:&nbsp;
+    <input type="number" [formControl]="buySellQuantity">
+</div>
+
+<div *ngIf="stockData.buy && stockData.wallet < stockData.currentPrice * (buySellQuantity.value ? buySellQuantity.value : 0)" class="warning-info">Not
+    enough money in wallet!</div>
+<div *ngIf="!stockData.buy && stockData.quantity < (buySellQuantity.value ? buySellQuantity.value : 0)" class="warning-info">You cannot sell the
+    stocks that you don't have!</div>
+
+<div class="line"></div>
+
+<div class="bottom-container">
+    <div class="total">Total:&nbsp;{{ stockData.currentPrice * (buySellQuantity.value ? buySellQuantity.value : 0) }}</div>
+    <button *ngIf="stockData.buy" class="btn btn-success" (click)="returnQuantity()"
+        [disabled]="(buySellQuantity.value ? buySellQuantity.value : 0) === 0 || stockData.wallet < (stockData.currentPrice * (buySellQuantity.value ? buySellQuantity.value : 0))">Buy</button>
+    <button *ngIf="!stockData.buy" class="btn btn-success" (click)="returnQuantity()"
+        [disabled]="(buySellQuantity.value ? buySellQuantity.value : 0) === 0 || stockData.quantity < (buySellQuantity.value ? buySellQuantity.value : 0)">Sell</button>
+</div>
