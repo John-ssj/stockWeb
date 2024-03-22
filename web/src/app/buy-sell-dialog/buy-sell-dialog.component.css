@@ -22,6 +22,24 @@
     color: gray;
 }
 
+.quantity-input {
+    padding: 5px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+@media (min-width: 768px) {
+    .quantity-input {
+        width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .quantity-input {
+        width: 160px;
+    }
+}
+
 .warning-info {
     margin: 3px 40px;
     font-size: 14px;

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -28,8 +29,9 @@ export class WatchlistComponent implements OnInit {
   showEmptyPrompt = false;
 
   constructor(
-    private serverService: ServerService,
-    private http: HttpClient
+    private router: Router,
+    private http: HttpClient,
+    private serverService: ServerService
   ) { }
 
   ngOnInit() {
@@ -68,7 +70,7 @@ export class WatchlistComponent implements OnInit {
           }
           if (result.success) {
             this.watchListData = this.watchListData.filter(item => item.stock !== stock);
-            if(this.watchListData.length === 0) {
+            if (this.watchListData.length === 0) {
               this.showEmptyPrompt = true;
             }
           }
@@ -76,5 +78,9 @@ export class WatchlistComponent implements OnInit {
       });
     } catch (error) {
     }
+  }
+
+  navigateToDetailPage(stock: string) {
+    this.router.navigateByUrl('/search/' + stock);
   }
 }

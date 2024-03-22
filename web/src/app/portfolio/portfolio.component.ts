@@ -61,7 +61,6 @@ export class PortfolioComponent implements OnInit {
           this.showLoading = false;
           this.showPortfolioView = true;
           this.showEmptyPrompt = false;
-          console.log('get data: ', result);
           if (Object.keys(result).length === 0 || Object.keys(result.portfolio).length === 0) {
             this.wallet = result.wallet ? result.wallet : 0;
             this.portfolioData = [];
@@ -94,13 +93,14 @@ export class PortfolioComponent implements OnInit {
               },
               data: {
                 "buy": buy,
-                "stock": this.stock,
+                "stock": stock,
                 "currentPrice": result.currentPrice,
                 "wallet": result.wallet,
                 "quantity": result.quantity
               }
             });
             dialogRef.afterClosed().subscribe(result => {
+              if (!result) { return; }
               const url = this.serverService.getServerUrl() + '/financial/' + (buy ? 'buy' : 'sell') + '?symbol=' + stock + '&quantity=' + result;
               this.http.get<any>(url).subscribe({
                 next: (result) => {

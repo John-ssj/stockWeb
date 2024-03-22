@@ -13,16 +13,16 @@
     <div class="watchlist-item-content">
         <span class="bi bi-x close-icon" (click)="uncollect(stockItem.stock)"></span>
 
-        <div class="item-detail">
+        <div class="item-detail" (click)="navigateToDetailPage(stockItem.stock)">
             <div class="item-detail-left">
                 <div class="stock">{{stockItem.stock}}</div>
                 <div class="name">{{stockItem.name}}</div>
             </div>
             <div class="item-detail-right">
-                <div class="detail-stock-price" [ngStyle]="{'color': stockItem.change > 0 ? 'green' : 'red'}">
+                <div class="detail-stock-price" [ngStyle]="{'color': stockItem.change === 0 ? 'black' : stockItem.change > 0 ? 'green' : 'red'}">
                     {{ stockItem.currentPrice }}
                 </div>
-                <div class="detail-stock-change" [ngStyle]="{'color': stockItem.change > 0 ? 'green' : 'red'}">
+                <div class="detail-stock-change" [ngStyle]="{'color': stockItem.change === 0 ? 'black' : stockItem.change > 0 ? 'green' : 'red'}">
                     <span *ngIf="stockItem.change > 0" class="bi bi-caret-up-fill"></span>
                     <span *ngIf="stockItem.change < 0" class="bi bi-caret-down-fill"></span>
                     {{ stockItem.change }}&nbsp;({{ stockItem.changePercent }}%)

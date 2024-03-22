@@ -89,6 +89,10 @@ export class SearchBarComponent implements OnInit {
   // 清空搜索框，跳转回搜索首页
   clearSearch() {
     this.searchForm.reset();
+    this.showErrorView = false;
+    this.showSuggestions = false;
+    this.showLoading = false;
+    this.stockSuggestions = [];
     this.router.navigate(['/search/home']);
   }
 

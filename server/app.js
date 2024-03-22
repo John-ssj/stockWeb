@@ -110,17 +110,17 @@ async function getStockDetailAndSummary(stock) {
           "symbol": data_1["ticker"],
           "name": data_1["name"],
           "code": data_1["exchange"],
-          "lastPrice": Number(data_2["c"].toFixed(2)),
-          "change": data_2["d"] ? Number(data_2["d"].toFixed(2)) : 0,
-          "changePercent": data_2["dp"] ? Number(data_2["dp"].toFixed(2)) : 0,
+          "lastPrice": data_2["c"].toFixed(2),
+          "change": data_2["d"] ? data_2["d"].toFixed(2) : "0.00",
+          "changePercent": data_2["dp"] ? data_2["dp"].toFixed(2) : "0.00",
           "timestamp": data_2["t"] + '000',
           "status": marketStatus
         },
         "summary": {
-          "highPrice": Number(data_2["h"].toFixed(2)),
-          "lowPrice": Number(data_2["l"].toFixed(2)),
-          "openPrice": Number(data_2["o"].toFixed(2)),
-          "prevClose": Number(data_2["pc"].toFixed(2)),
+          "highPrice": data_2["h"].toFixed(2),
+          "lowPrice": data_2["l"].toFixed(2),
+          "openPrice": data_2["o"].toFixed(2),
+          "prevClose": data_2["pc"].toFixed(2),
           "ipo": data_1["ipo"],
           "industry": data_1["finnhubIndustry"],
           "webpage": data_1["weburl"],
@@ -230,12 +230,12 @@ async function getStockInsights(stock) {
       });
 
       extracted_data = {
-        "totalMspr": Number(totalMspr.toFixed(2)),
-        "positiveMspr": Number(positiveMspr.toFixed(2)),
-        "negativeMspr": Number(negativeMspr.toFixed(2)),
-        "totalChange": Number(totalChange.toFixed(2)),
-        "positiveChange": Number(positiveChange.toFixed(2)),
-        "negativeChange": Number(negativeChange.toFixed(2))
+        "totalMspr": totalMspr.toFixed(2),
+        "positiveMspr": positiveMspr.toFixed(2),
+        "negativeMspr": negativeMspr.toFixed(2),
+        "totalChange": totalChange.toFixed(2),
+        "positiveChange": positiveChange.toFixed(2),
+        "negativeChange": negativeChange.toFixed(2)
       }
       return extracted_data;
     }
@@ -394,9 +394,9 @@ async function getFinancialPrice(stock) {
   const response = await fetch(target_url);
   const data = await response.json();
   return {
-    "currentPrice": Number(data["c"].toFixed(2)),
-    "change": Number(data["d"].toFixed(2)),
-    "changePercent": data["dp"] ? Number(data["dp"].toFixed(2)) : 0
+    "currentPrice": data["c"].toFixed(2),
+    "change": data["d"].toFixed(2),
+    "changePercent": data["dp"] ? data["dp"].toFixed(2) : "0.00"
   };
 }
 
@@ -404,7 +404,7 @@ async function getPortfolio() {
   try {
     const profile = await UserFinancialProfile.findOne({ id: 0 });
     if (profile) {
-      const wallet = Number(profile.wallet.toFixed(2));
+      const wallet = profile.wallet.toFixed(2);
       const portfolioData = await Promise.all(profile.portfolio.map(async (item) => {
         const priceData = await getFinancialPrice(item.stock);
         const avgCost = item.totalCost / item.quantity;
@@ -412,11 +412,11 @@ async function getPortfolio() {
           "stock": item.stock,
           "name": item.name,
           "quantity": item.quantity.toFixed(2),
-          "totalCost": Number(item.totalCost.toFixed(2)),
-          "avgCost": Number(avgCost.toFixed(2)),
-          "currentPrice": Number(priceData.currentPrice.toFixed(2)),
-          "change": Number((priceData.currentPrice - avgCost).toFixed(2)),
-          "marketValue": Number((priceData.currentPrice * item.quantity).toFixed(2)),
+          "totalCost": item.totalCost.toFixed(2),
+          "avgCost": avgCost.toFixed(2),
+          "currentPrice": priceData.currentPrice,
+          "change": (Number(priceData.currentPrice) - Number(avgCost.toFixed(2))).toFixed(2),
+          "marketValue": (Number(priceData.currentPrice) * item.quantity).toFixed(2),
         };
       }));
       return { "wallet": wallet, "portfolio": portfolioData };
@@ -453,7 +453,7 @@ app.get('/financial/getWallet', async (req, res) => {
   try {
     const profile = await UserFinancialProfile.findOne({ id: 0 });
     if (profile) {
-      res.json({ "wallet": Number(profile.wallet.toFixed(2)) });
+      res.json({ "wallet": profile.wallet.toFixed(2) });
     } else {
       res.status(404).send({});
     }
@@ -472,9 +472,9 @@ app.get('/financial/getWatchList', async (req, res) => {
         return {
           "stock": item.stock,
           "name": item.name,
-          "currentPrice": Number(priceData.currentPrice.toFixed(2)),
-          "change": Number(priceData.change.toFixed(2)),
-          "changePercent": Number(priceData.changePercent.toFixed(2))
+          "currentPrice": priceData.currentPrice,
+          "change": priceData.change,
+          "changePercent": priceData.changePercent
         };
       }));
       res.json({ "watchList": watchListData });
@@ -520,7 +520,7 @@ app.get('/financial/getPrice', async (req, res) => {
     const portfolioItem = profile.portfolio.find(item => item.stock === symbol);
     const quantity = portfolioItem ? portfolioItem.quantity : 0;
     const price = await getFinancialPrice(symbol);
-    res.json({ "wallet": Number(profile.wallet.toFixed(2)), "currentPrice": price.currentPrice, "quantity": quantity });
+    res.json({ "wallet": profile.wallet.toFixed(2), "currentPrice": price.currentPrice, "quantity": quantity });
   } catch (error) {
     res.json({});
   }
@@ -649,13 +649,11 @@ app.get('/financial/sell', async (req, res) => {
     portfolio_data["success"] = true;
     res.json(portfolio_data);
     return;
-  } else {
-    const portfolio_data = await getPortfolio();
-    portfolio_data["success"] = false;
-    res.json(portfolio_data);
-    return;
   }
-  res.status(500).send({});
+  const portfolio_data = await getPortfolio();
+  portfolio_data["success"] = false;
+  res.json(portfolio_data);
+  return;
 });
 
 app.use(express.static(__dirname + '/dist/web/browser'));

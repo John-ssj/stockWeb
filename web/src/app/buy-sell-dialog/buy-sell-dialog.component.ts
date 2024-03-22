@@ -24,6 +24,6 @@ export class BuySellDialogComponent implements OnInit {
   }
 
   returnQuantity() {
-    this.dialogRef.close(this.buySellQuantity.valid ? this.buySellQuantity.value : 0);
+    this.dialogRef.close(this.buySellQuantity.value ? this.buySellQuantity.value : 0);
   }
 }

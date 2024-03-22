@@ -68,7 +68,6 @@ export class StockDetailComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    // this.stock = this.route.snapshot.paramMap.get('stock')!;
     this.route.params.subscribe(params => {
       this.stock = params['stock'].toUpperCase();
       this.loadData();
@@ -103,7 +102,7 @@ export class StockDetailComponent implements OnInit, OnDestroy {
         const url = this.serverService.getServerUrl() + '/stock/company?symbol=' + this.stock;
         this.http.get<any>(url).subscribe({
           next: (result) => {
-            console.log('Stock data:', result);
+            // console.log('Stock data:', result);
             this.stockData = result;
             if (Object.keys(this.stockData).length === 0) {
               this.stockService.updateStockData("no");
@@ -214,9 +213,6 @@ export class StockDetailComponent implements OnInit, OnDestroy {
       },
       data: this.stockData.news[index]
     });
-    // dialogRef.afterClosed().subscribe(result => {
-    //   console.log('The dialog was closed');
-    // });
   }
 
   updateSummaryCharts() {
@@ -239,6 +235,7 @@ export class StockDetailComponent implements OnInit, OnDestroy {
 
       series: [{
         name: 'AAPL',
+        color: this.stockData.summary.status ? 'green' : 'red',
         data: this.stockData.summaryCharts,
         tooltip: {
           valueDecimals: 2
@@ -487,6 +484,7 @@ export class StockDetailComponent implements OnInit, OnDestroy {
               }
             });
             dialogRef.afterClosed().subscribe(result => {
+              if (!result) { return; }
               const url = this.serverService.getServerUrl() + '/financial/' + (buy ? 'buy' : 'sell') + '?symbol=' + this.stock + '&quantity=' + result;
               this.http.get<any>(url).subscribe({
                 next: (result) => {
