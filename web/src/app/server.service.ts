@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ServerService {
-  private serverUrl = 'http://127.0.0.1:8080';
+  private serverUrl = 'https://web3-node-418010.wm.r.appspot.com';
   
   getServerUrl() {
     return this.serverUrl;

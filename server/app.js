@@ -1,3 +1,6 @@
+'use strict';
+
+// [START app]
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -10,7 +13,6 @@ mongoose.connect('mongodb+srv://hayleyliu:InB2FwIu9o1Ny3hU@stockwebdb.k3nzcez.mo
 });
 
 const app = express();
-const port = 8080;
 
 app.use(cors());
 
@@ -229,7 +231,7 @@ async function getStockInsights(stock) {
         if (item.change < 0) negativeChange += item.change;
       });
 
-      extracted_data = {
+      const extracted_data = {
         "totalMspr": totalMspr.toFixed(2),
         "positiveMspr": positiveMspr.toFixed(2),
         "negativeMspr": negativeMspr.toFixed(2),
@@ -662,6 +664,11 @@ app.get('*', function (req, res) {
   res.sendFile(path.join(__dirname + '/dist/web/browser/index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+// Listen to the App Engine-specified port, or 8080 otherwise
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}...`);
 });
+// [END app]
+
+module.exports = app;
