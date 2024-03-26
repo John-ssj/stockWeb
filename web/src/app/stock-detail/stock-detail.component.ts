@@ -234,8 +234,8 @@ export class StockDetailComponent implements OnInit, OnDestroy {
       },
 
       series: [{
-        name: 'AAPL',
-        color: this.stockData.summary.status ? 'green' : 'red',
+        name: this.stock,
+        color: this.stockData.detail.change > 0 ? 'green' : 'red',
         data: this.stockData.summaryCharts,
         tooltip: {
           valueDecimals: 2

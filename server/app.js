@@ -8,9 +8,7 @@ const cors = require('cors');
 const UserFinancialProfile = require('./UserFinancialProfile.js');
 
 // MongoDB 连接
-mongoose.connect('mongodb+srv://hayleyliu:InB2FwIu9o1Ny3hU@stockwebdb.k3nzcez.mongodb.net/StockWeb?retryWrites=true&w=majority&appName=stockWebDB', {
-  useNewUrlParser: true
-});
+mongoose.connect('mongodb+srv://hayleyliu:InB2FwIu9o1Ny3hU@stockwebdb.k3nzcez.mongodb.net/StockWeb?retryWrites=true&w=majority&appName=stockWebDB');
 
 const app = express();
 
@@ -54,24 +52,28 @@ app.get('/stock/search', async (req, res) => {
 });
 
 async function getStockSummaryCharts(stock, date) {
-  const t = new Date(Number(date));
-  const time_to = t.toISOString().split('T')[0];
-  t.setDate(t.getDate() - 1);
-  const time_from = t.toISOString().split('T')[0];
-  const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/60/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+  let t = new Date(Number(date));
   let data = {};
   try {
-    const response = await fetch(target_url);
-    data = await response.json();
-    if (Object.keys(data).length === 0) {
-      return {};
-    } else {
-      const extracted_data = data.results.map(item => {
-        return [item.t, Number(item.vw.toFixed(2))]
-      });
-      const selected_data = extracted_data.length <= 24 ? extracted_data : extracted_data.slice(-24);
-      return selected_data;
+    for (let i = 0; i < 4; i++) {
+        const time_to = t.toISOString().split('T')[0];
+        t.setDate(t.getDate() - 1);
+        const time_from = t.toISOString().split('T')[0];
+        const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/60/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+        const response = await fetch(target_url);
+        data = await response.json();
+        if (Object.keys(data).length !== 0 && data.resultsCount !== 0) {
+          break;
+        }
     }
+    if (Object.keys(data).length === 0 || data.resultsCount === 0) {
+      return {};
+    }
+    const extracted_data = data.results.map(item => {
+      return [item.t, Number(item.vw.toFixed(2))]
+    });
+    const selected_data = extracted_data.length <= 24 ? extracted_data : extracted_data.slice(-24);
+    return selected_data;
   } catch (error) {
     console.error('Error:', error);
     console.log(data);
@@ -330,6 +332,7 @@ app.get('/stock/company', async (req, res) => {
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
   if (!symbol) { return res.status(400).json({}); }
+  res.set('Cache-Control', 'no-store');
 
   try {
     let return_data = await getStockDetailAndSummary(symbol);
@@ -365,6 +368,7 @@ app.get('/stock/update', async (req, res) => {
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
   if (!symbol) { return res.status(400).json({}); }
+  res.set('Cache-Control', 'no-store');
 
   try {
     let return_data = await getStockDetailAndSummary(symbol);
@@ -432,6 +436,7 @@ async function getPortfolio() {
 }
 
 app.get('/financial/init', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     await UserFinancialProfile.deleteMany({});
 
@@ -452,6 +457,7 @@ app.get('/financial/init', async (req, res) => {
 });
 
 app.get('/financial/getWallet', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     const profile = await UserFinancialProfile.findOne({ id: 0 });
     if (profile) {
@@ -466,6 +472,7 @@ app.get('/financial/getWallet', async (req, res) => {
 });
 
 app.get('/financial/getWatchList', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     const profile = await UserFinancialProfile.findOne({ id: 0 });
     if (profile) {
@@ -490,11 +497,13 @@ app.get('/financial/getWatchList', async (req, res) => {
 });
 
 app.get('/financial/getPortfolio', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const portfolio_data = await getPortfolio();
   res.json(portfolio_data);
 });
 
 app.get('/financial/getInfo', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (!req.query.symbol) { return res.json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
@@ -512,6 +521,7 @@ app.get('/financial/getInfo', async (req, res) => {
 });
 
 app.get('/financial/getPrice', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (!req.query.symbol) { return res.json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
@@ -529,6 +539,7 @@ app.get('/financial/getPrice', async (req, res) => {
 });
 
 app.get('/financial/addWatchList', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (!req.query.symbol) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
@@ -554,6 +565,7 @@ app.get('/financial/addWatchList', async (req, res) => {
 });
 
 app.get('/financial/removeWatchList', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (!req.query.symbol) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
@@ -575,6 +587,7 @@ app.get('/financial/removeWatchList', async (req, res) => {
 });
 
 app.get('/financial/buy', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (!req.query.symbol || !req.query.quantity) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
@@ -620,6 +633,7 @@ app.get('/financial/buy', async (req, res) => {
 });
 
 app.get('/financial/sell', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (!req.query.symbol || !req.query.quantity) { return res.status(400).json({}); }
   const symbolMatches = req.query.symbol.match(/[a-zA-Z]+/g);
   const symbol = symbolMatches ? symbolMatches.join('').toUpperCase() : '';
@@ -658,9 +672,16 @@ app.get('/financial/sell', async (req, res) => {
   return;
 });
 
-app.use(express.static(__dirname + '/dist/web/browser'));
+app.use(function(req, res, next) {
+  console.log(`Request Path: ${req.path}, Query: ${JSON.stringify(req.query)}`);
+  next();
+});
+
+app.use(express.static(path.join(__dirname, '/dist/web/browser')));
 
 app.get('*', function (req, res) {
+  res.set('Cache-Control', 'no-store');
+  console.log("in '*' : ", req.path);
   res.sendFile(path.join(__dirname + '/dist/web/browser/index.html'));
 });
 

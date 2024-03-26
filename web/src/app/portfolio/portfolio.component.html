@@ -77,15 +77,15 @@
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="value-item" [ngStyle]="{'color': stockItem.change === 0 ? 'black' : stockItem.change > 0 ? 'green' : 'red'}">
+                                <div class="value-item" [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
                                     <span *ngIf="stockItem.change > 0" class="bi bi-caret-up-fill"></span>
                                     <span *ngIf="stockItem.change < 0" class="bi bi-caret-down-fill"></span>
                                     {{ stockItem.change }}
                                 </div>
-                                <div class="value-item" [ngStyle]="{'color': stockItem.change === 0 ? 'black' : stockItem.change > 0 ? 'green' : 'red'}">
+                                <div class="value-item" [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
                                     {{ stockItem.currentPrice }}
                                 </div>
-                                <div class="value-item" [ngStyle]="{'color': stockItem.change === 0 ? 'black' : stockItem.change > 0 ? 'green' : 'red'}">
+                                <div class="value-item" [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
                                     {{ stockItem.marketValue }}
                                 </div>
                             </div>
