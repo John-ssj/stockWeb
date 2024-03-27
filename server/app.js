@@ -56,15 +56,15 @@ async function getStockSummaryCharts(stock, date) {
   let data = {};
   try {
     for (let i = 0; i < 4; i++) {
-        const time_to = t.toISOString().split('T')[0];
-        t.setDate(t.getDate() - 1);
-        const time_from = t.toISOString().split('T')[0];
-        const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/60/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
-        const response = await fetch(target_url);
-        data = await response.json();
-        if (Object.keys(data).length !== 0 && data.resultsCount !== 0) {
-          break;
-        }
+      const time_to = t.toISOString().split('T')[0];
+      t.setDate(t.getDate() - 1);
+      const time_from = t.toISOString().split('T')[0];
+      const target_url = `https://api.polygon.io/v2/aggs/ticker/${stock}/range/60/minute/${time_from}/${time_to}?adjusted=true&sort=asc&apiKey=${api_key_polygon}`;
+      const response = await fetch(target_url);
+      data = await response.json();
+      if (Object.keys(data).length !== 0 && data.resultsCount !== 0) {
+        break;
+      }
     }
     if (Object.keys(data).length === 0 || data.resultsCount === 0) {
       return {};
@@ -672,8 +672,11 @@ app.get('/financial/sell', async (req, res) => {
   return;
 });
 
-app.use(function(req, res, next) {
-  console.log(`Request Path: ${req.path}, Query: ${JSON.stringify(req.query)}`);
+app.use(function (req, res, next) {
+  if (req.path == "" || req.path == "/" || req.path == "index.html") {
+    res.set('Cache-Control', 'no-store');
+  }
+  // console.log(`Request Path: ${req.path}, Query: ${JSON.stringify(req.query)}`);
   next();
 });
 
@@ -681,7 +684,7 @@ app.use(express.static(path.join(__dirname, '/dist/web/browser')));
 
 app.get('*', function (req, res) {
   res.set('Cache-Control', 'no-store');
-  console.log("in '*' : ", req.path);
+  // console.log("in '*' : ", req.path);
   res.sendFile(path.join(__dirname + '/dist/web/browser/index.html'));
 });
 

@@ -146,11 +146,12 @@ export class StockDetailComponent implements OnInit, OnDestroy {
   }
 
   setUpViewData() {
-    if (this.stockData.detail.status) {
-      this.detailDate = this.stockData.detail.timestamp;
-    } else {
-      this.detailDate = new Date();
-    }
+    // if (this.stockData.detail.status) {
+    //   this.detailDate = this.stockData.detail.timestamp;
+    // } else {
+    //   this.detailDate = new Date();
+    // }
+    this.detailDate = new Date();
     this.updateSummaryCharts();
     this.updateMainCharts();
     this.updateInsightsTrendsCharts();
