@@ -29,75 +29,79 @@
         </div>
     </div>
 
-    <div *ngFor="let stockItem of portfolioData">
-        <div class="portfolio-item-content">
-            <div class="item-top">
-                <div class="stock">{{ stockItem.stock }}</div>
-                <div class="name">{{ stockItem.name }}</div>
-            </div>
-            <div class="item-detail">
-                <div class="row" style="margin: 10px 0;">
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="key-item">
-                                    Quantity:
+    <div style="margin-bottom: 40px;">
+        <div *ngFor="let stockItem of portfolioData">
+            <div class="portfolio-item-content">
+                <div class="item-top">
+                    <div class="stock">{{ stockItem.stock }}</div>
+                    <div class="name">{{ stockItem.name }}</div>
+                </div>
+                <div class="item-detail">
+                    <div class="row" style="margin: 10px 0;">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="key-item">
+                                        Quantity:
+                                    </div>
+                                    <div class="key-item">
+                                        Avg. Cost / share:
+                                    </div>
+                                    <div class="key-item">
+                                        Total Cost:
+                                    </div>
                                 </div>
-                                <div class="key-item">
-                                    Avg. Cost / share:
-                                </div>
-                                <div class="key-item">
-                                    Total Cost:
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="value-item">
-                                    {{ stockItem.quantity }}
-                                </div>
-                                <div class="value-item">
-                                    {{ stockItem.avgCost }}
-                                </div>
-                                <div class="value-item">
-                                    {{ stockItem.totalCost }}
+                                <div class="col-4">
+                                    <div class="value-item">
+                                        {{ stockItem.quantity }}
+                                    </div>
+                                    <div class="value-item">
+                                        {{ stockItem.avgCost }}
+                                    </div>
+                                    <div class="value-item">
+                                        {{ stockItem.totalCost }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="key-item">
-                                    Change:
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="key-item">
+                                        Change:
+                                    </div>
+                                    <div class="key-item">
+                                        Current Price:
+                                    </div>
+                                    <div class="key-item">
+                                        Market Value:
+                                    </div>
                                 </div>
-                                <div class="key-item">
-                                    Current Price:
-                                </div>
-                                <div class="key-item">
-                                    Market Value:
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="value-item" [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
-                                    <span *ngIf="stockItem.change > 0" class="bi bi-caret-up-fill"></span>
-                                    <span *ngIf="stockItem.change < 0" class="bi bi-caret-down-fill"></span>
-                                    {{ stockItem.change }}
-                                </div>
-                                <div class="value-item" [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
-                                    {{ stockItem.currentPrice }}
-                                </div>
-                                <div class="value-item" [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
-                                    {{ stockItem.marketValue }}
+                                <div class="col-4">
+                                    <div class="value-item"
+                                        [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
+                                        <span *ngIf="stockItem.change > 0" class="bi bi-caret-up-fill"></span>
+                                        <span *ngIf="stockItem.change < 0" class="bi bi-caret-down-fill"></span>
+                                        {{ stockItem.change }}
+                                    </div>
+                                    <div class="value-item"
+                                        [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
+                                        {{ stockItem.currentPrice }}
+                                    </div>
+                                    <div class="value-item"
+                                        [ngStyle]="{'color': stockItem.change == 0 ? 'black' : (stockItem.change > 0 ? 'green' : 'red')}">
+                                        {{ stockItem.marketValue }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="item-bottom">
-                <button class="btn btn-primary" (click)="buySellStock(true, stockItem.stock)">Buy</button>
-                <button class="btn btn-danger" (click)="buySellStock(false, stockItem.stock)">Sell</button>
+                <div class="item-bottom">
+                    <button class="btn btn-primary" (click)="buySellStock(true, stockItem.stock)">Buy</button>
+                    <button class="btn btn-danger" (click)="buySellStock(false, stockItem.stock)">Sell</button>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
