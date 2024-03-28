@@ -9,7 +9,7 @@
 </div>
 
 <div *ngIf="showLoading" class="loadingView"><mat-spinner class="custom-spinner"></mat-spinner></div>
-<div style="margin-bottom: 40px;">
+<div style="margin-bottom: 100px;">
     <div *ngFor="let stockItem of watchListData">
         <div class="watchlist-item-content">
             <span class="bi bi-x close-icon" (click)="uncollect(stockItem.stock)"></span>
