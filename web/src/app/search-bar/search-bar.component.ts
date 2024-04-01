@@ -33,12 +33,12 @@ export class SearchBarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.searchForm.get('stockInput')?.valueChanges.subscribe(value => {
-      this.stockSearch(value ?? '');
-    });
     if (this.initStock !== '') {
       this.loadStock(this.initStock);
     }
+    this.searchForm.get('stockInput')?.valueChanges.subscribe(value => {
+      this.stockSearch(value ?? '');
+    });
   }
 
   // stock补全提示
