@@ -26,4 +26,10 @@ export class BuySellDialogComponent implements OnInit {
   returnQuantity() {
     this.dialogRef.close(this.buySellQuantity.value ? this.buySellQuantity.value : 0);
   }
+
+  isIntegerValue(value: any): boolean {
+    if(value === null || value === undefined || value === '') return false;
+    if(isNaN(value)) return false;
+    return Number.isInteger(Number(value));
+  }
 }
