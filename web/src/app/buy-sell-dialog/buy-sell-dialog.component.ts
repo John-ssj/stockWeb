@@ -28,6 +28,7 @@ export class BuySellDialogComponent implements OnInit {
   }
 
   isIntegerValue(value: any): boolean {
+    console.log(value);
     if(value === null || value === undefined || value === '') return false;
     if(isNaN(value)) return false;
     return Number.isInteger(Number(value));

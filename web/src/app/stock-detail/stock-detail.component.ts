@@ -111,11 +111,6 @@ export class StockDetailComponent implements OnInit, OnDestroy {
             }
             this.stockService.updateStockData(this.stockData);
             this.fn_showDetailView();
-            if (this.stockData.detail.status) {
-              this.updateSubscription = interval(15000).subscribe(() => {
-                this.updateViewData();
-              });
-            }
           },
           error: (error) => {
             console.error('Error fetching stock data:', error);
@@ -198,6 +193,11 @@ export class StockDetailComponent implements OnInit, OnDestroy {
     this.showDetailView = true;
     this.showErrorView = false;
     this.setUpViewData();
+    if (this.stockData.detail.status) {
+      this.updateSubscription = interval(15000).subscribe(() => {
+        this.updateViewData();
+      });
+    }
   }
 
   fn_showErrorView() {

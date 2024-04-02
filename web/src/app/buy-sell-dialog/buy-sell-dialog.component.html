@@ -14,12 +14,10 @@
     <input type="number" [formControl]="buySellQuantity" class="quantity-input">
 </div>
 
-<div *ngIf="!isIntegerValue(buySellQuantity.value)" class="warning-info">Quantity
-    should be an Integer!</div>
-<div *ngIf="stockData.buy && (buySellQuantity.value ? isIntegerValue(buySellQuantity.value) : false) && stockData.wallet < stockData.currentPrice * (buySellQuantity.value ? buySellQuantity.value : 0)"
+<div *ngIf="stockData.buy && stockData.wallet < stockData.currentPrice * (buySellQuantity.value ? buySellQuantity.value : 0)"
     class="warning-info">Not
     enough money in wallet!</div>
-<div *ngIf="!stockData.buy && (buySellQuantity.value ? isIntegerValue(buySellQuantity.value) : false) && stockData.quantity < (buySellQuantity.value ? buySellQuantity.value : 0)"
+<div *ngIf="!stockData.buy && stockData.quantity < (buySellQuantity.value ? buySellQuantity.value : 0)"
     class="warning-info">You cannot sell the
     stocks that you don't have!</div>
 
